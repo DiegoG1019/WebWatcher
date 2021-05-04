@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebWatcher", "WebWatcher\WebWatcher.csproj", "{1B7F7A10-EE0B-43EB-9EDC-28C9876CAE08}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.Utilities.Serialization", "..\DGUtilities\DiegoG.Utilities.Serialization\DiegoG.Utilities.Serialization.csproj", "{CE2E22B4-D974-46C9-B148-993681EBF8A8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.Utilities.Basic", "..\DGUtilities\DiegoG.Utilities.Basic\DiegoG.Utilities.Basic.csproj", "{74049E0D-6B37-4B40-AFD0-171C80916DC2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.Utilities.Collections", "..\DGUtilities\DiegoG.Utilities.Collections\DiegoG.Utilities.Collections.csproj", "{E429547E-E82F-4B91-833D-4A3345AF3F13}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.CLI", "..\DGUtilities\DiegoG.CLI\DiegoG.CLI.csproj", "{BB184765-591B-4EB8-B44E-7B11F83EA0A9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.TelegramBot", "..\DGUtilities\DiegoG.TelegramBot\DiegoG.TelegramBot.csproj", "{DA4BF19C-3D6B-4B29-BF96-E1BAB51EAE67}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.Utilities.Base", "..\DGUtilities\DiegoG.Utilities.Base\DiegoG.Utilities.Base.csproj", "{515FEFBE-3CEF-4EA2-939A-0A4E771D84AA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1B7F7A10-EE0B-43EB-9EDC-28C9876CAE08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B7F7A10-EE0B-43EB-9EDC-28C9876CAE08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B7F7A10-EE0B-43EB-9EDC-28C9876CAE08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B7F7A10-EE0B-43EB-9EDC-28C9876CAE08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE2E22B4-D974-46C9-B148-993681EBF8A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE2E22B4-D974-46C9-B148-993681EBF8A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE2E22B4-D974-46C9-B148-993681EBF8A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE2E22B4-D974-46C9-B148-993681EBF8A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74049E0D-6B37-4B40-AFD0-171C80916DC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74049E0D-6B37-4B40-AFD0-171C80916DC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74049E0D-6B37-4B40-AFD0-171C80916DC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74049E0D-6B37-4B40-AFD0-171C80916DC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E429547E-E82F-4B91-833D-4A3345AF3F13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E429547E-E82F-4B91-833D-4A3345AF3F13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E429547E-E82F-4B91-833D-4A3345AF3F13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E429547E-E82F-4B91-833D-4A3345AF3F13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB184765-591B-4EB8-B44E-7B11F83EA0A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB184765-591B-4EB8-B44E-7B11F83EA0A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB184765-591B-4EB8-B44E-7B11F83EA0A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB184765-591B-4EB8-B44E-7B11F83EA0A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA4BF19C-3D6B-4B29-BF96-E1BAB51EAE67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA4BF19C-3D6B-4B29-BF96-E1BAB51EAE67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA4BF19C-3D6B-4B29-BF96-E1BAB51EAE67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA4BF19C-3D6B-4B29-BF96-E1BAB51EAE67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{515FEFBE-3CEF-4EA2-939A-0A4E771D84AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{515FEFBE-3CEF-4EA2-939A-0A4E771D84AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{515FEFBE-3CEF-4EA2-939A-0A4E771D84AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{515FEFBE-3CEF-4EA2-939A-0A4E771D84AA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4F248EB6-89BA-46FB-A60F-08F93F5833EB}
+	EndGlobalSection
+EndGlobal
