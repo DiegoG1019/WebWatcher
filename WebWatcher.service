@@ -1,0 +1,23 @@
+[Unit]
+Description=Web Watcher Scraper application
+
+[Service]
+# systemd will run this executable to start the service
+ExecStart=/home/USERID/WebWatcher/DiegoG.WebWatcher
+
+# to query logs using journalctl, set a logical name here
+SyslogIdentifier=WebWatcher
+
+# Use your username to keep things simple.
+# There are three references to USERID in this file. This one, ExecStart and Environment=DataDirectory
+# In linux, if DataDirectory is not set, and its run as a server, it will try to write in root, which will result in an exception.
+# After this is done, simply use `sudo cp This/file/WebWatcher.service /etc/systemd/system/`
+User=USERID
+
+# This environment variable is necessary when dotnet isn't loaded for the specified user.
+# To figure out this value, run 'env | grep DOTNET_ROOT' when dotnet has been loaded into your shell.
+Environment=DOTNET_ROOT=/opt/rh/rh-dotnet31/root/usr/lib64/dotnet, 
+Environment=DataDirectory=/home/USERID/WebWatcher/
+
+[Install]
+WantedBy=multi-user.target

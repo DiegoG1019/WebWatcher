@@ -8,6 +8,7 @@ Download this Repo, as well as [DGUtilities](https://github.com/DiegoG1019/DGUti
 
 ## Usage
 
+### First Run
 In orden for a succesful project run, two things are needed:
 - A `.config/settings.cfg.json` file. It will automatically be generated along with an exception the first time you run the program, fill out the fields, and run again.
 
@@ -25,10 +26,33 @@ Replace `TelegramUserId` with your user id, you can find it using the @raw_data_
 
 Once the bot is up and running, type /help
 
+### Output channels
+This project is hardwired to sink logs and WCT data into specific channels. 
+- The WCT Channel Id is in WitchCultTranslationsWatcher class as a `const`
+- The log channel id is in `Program.cs` in the log configuration Chain Call
+Make sure to comment the registration of WCT Watcher and Telegram Bot sinks, or else you will face plenty of errors.
+Alternatively, you can add your bot to channels you own and use their Id instead.
+
+### Watch Routines
+
 In order to make more Watch routines, simply create a class that implements IWebWatcher and register it along the others in `Program.cs`
 (I'm in the works of making it attribute reflection based, but that's on hold for now)
 
+### Bot commands
+
 In order to make more Bot commands, simply make a new class that implements `IBotCommand` and decorate it with the `BotCommand` attribute. Nothing else needs to be done. You can even replace /help and /start, as all commands are loaded first and then, if they're not found, they're defaulted. If they're found, yours will be used instead.
+
+### Run as a service
+In order to run this app as a service, take a look at the `WebWatcher.service` systemd service file template
+Commands:
+1. `nano WebWatcher/WebWatcher.service` use `sudo` if doing it through another user, to edit the service file
+2. `sudo chmod 7xx WebWatcher/DiegoG.WebWatcher` to make sure the file is executable
+3. `sudo chown USERID -R WebWatcher` to make sure the entire directory is owned by the user owning the service
+4. `sudo cp WebWatcher/WebWatcher.service /etc/systemd/system/` to throw the file into the service files directory
+5. `sudo systemctl daemon-reload` to make sure your file is visible
+6. `sudo systemctl start WebWatcher` to start the service
+8. OPTIONAL: After a few seconds, `sudo systemctl status WebWatcher` to verify the status of the service.
+
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
