@@ -109,6 +109,7 @@ namespace DiegoG.WebWatcher
             catch (Exception) { }
             Directory.CreateDirectory(LastPostDir);
             Serialization.Serialize.Json("Arc 7, Chapter 11 \u2013 Lifeblood Ritual", LastPostDir, LastPostFile);
+            LastUpload = "Arc 7, Chapter 11 \u2013 Lifeblood Ritual";
         }
     }
 }

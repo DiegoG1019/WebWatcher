@@ -17,9 +17,11 @@ namespace DiegoG.WebWatcher
     public static class Program
     {
         public static TimeSpan RunningTime => RunningTimeWatch.Elapsed;
-        public readonly static Version Version = new(0, 0, 5, 2);
+        public readonly static Version Version = new(0, 0, 6, 0);
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private static IHost ProgramHost;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private readonly static Stopwatch RunningTimeWatch = new();
         private readonly static TimeSpan NetworkWait = TimeSpan.FromMinutes(.5);
         public static async Task Main(string[] args)
@@ -29,7 +31,7 @@ namespace DiegoG.WebWatcher
 
             Settings<WatcherSettings>.Initialize(Directories.Configuration, "settings.cfg", true, null, s =>
             {
-                s.EnableList = new Dictionary<string, bool>();
+                s.EnableList ??= new Dictionary<string, bool>();
             });
 
             if (Settings<WatcherSettings>.Current.BotAPIKey is null)
@@ -45,7 +47,7 @@ namespace DiegoG.WebWatcher
                     OutputBot.StartReceiving(new[] { UpdateType.Message });
                     ProgramHost.Run();
                 }
-                catch (HttpRequestException e)
+                catch (HttpRequestException)
                 {
                     Log.Warning($"Caught an HTTP Request Exception, waiting {NetworkWait.TotalSeconds} seconds and trying again");
                     OutputBot.StopReceiving();
@@ -55,7 +57,7 @@ namespace DiegoG.WebWatcher
                 catch(Exception e)
                 {
                     Log.Fatal($"Unhandled Exception Caught at Main {e.Message}");
-                    Log.Fatal(e);
+                    Log.Fatal(e, e.GetType().Name);
                     Log.CloseAndFlush();
                     Console.WriteLine($"Unhandled Exception Caught at Main {e.Message}:\n{e}");
                     throw;
@@ -72,11 +74,13 @@ namespace DiegoG.WebWatcher
             BotCommandProcessor.Initialize(OutputBot.SendTextMessage);
             OutputBot.OnMessage += BotCommandProcessor.Bot_OnMessage;
 
+            var settings = Settings<WatcherSettings>.Current;
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
-                .WriteTo.Console(Serilog.Events.LogEventLevel.Debug)
-                .WriteTo.File(Directories.InLogs(".log"), rollingInterval: RollingInterval.Hour, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose)
-                .WriteTo.TelegramBot(-1001445070822, OutputBot.Client, Serilog.Events.LogEventLevel.Debug)
+                .WriteTo.Console(settings.ConsoleLogEventLevel)
+                .WriteTo.File(Directories.InLogs(".log"), rollingInterval: RollingInterval.Hour, restrictedToMinimumLevel: settings.FileLogEventLevel)
+                .WriteTo.TelegramBot(-1001445070822, OutputBot.Client, settings.BotLogEventLevel)
                 .CreateLogger();
 
             Service.LoadWatchers();
