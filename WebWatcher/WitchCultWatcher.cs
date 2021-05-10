@@ -6,18 +6,22 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DiegoG.TelegramBot;
 using DiegoG.Utilities.IO;
 using HtmlAgilityPack;
 using Serilog;
 
 namespace DiegoG.WebWatcher
 {
+    [Watcher]
     public class WitchCultWatcher : IWebWatcher
     {
         private const long WitchCultChatID = -1001321283021;
         private string? LastUpload = null;
 
         public TimeSpan Interval { get; } = TimeSpan.FromHours(1);
+
+        public string Name => "WitchCultWatcher";
 
         public Task Check() => Task.Run(() =>
         {
@@ -28,42 +32,62 @@ namespace DiegoG.WebWatcher
                 using StreamReader sR = new(WebRequest.Create("https://witchculttranslation.com/").GetResponse().GetResponseStream());
                 var doc = new HtmlDocument();
                 doc.LoadHtml(sR.ReadToEnd());
-                var r = doc.DocumentNode.Descendants("ul")
+
+                var sidebar = doc.DocumentNode.Descendants("ul")
                 .Where(node => node.HasClass("rpwe-ul"))
-                .First()
-                .FirstChild
-                .Descendants("h3")
-                .First()
-                .FirstChild;
+                .First();
 
-                Log.Debug("Matching Text from WitchCultTranslations");
+                string title, link;
+                string? latest = null;
+                Stack<string> Stack = new();
 
-                var title = Regex.Replace(r.InnerText, @"[#-&]+\d+;", "").Replace("-", @"\-").Replace("#", @"\#");
-                var link = r.GetAttributeValue("href", null);
-
-                if (title is null)
+                for (int i = 0; ; i++) 
                 {
-                    Log.Warning("Could not locate The latest post from WitchCultTranslation's title");
-                    throw new InvalidDataException("Could not locate The latest post from WitchCultTranslation's title");
+                    var r = sidebar
+                    .ChildNodes[i]
+                    .Descendants("h3")
+                    .First()
+                    .FirstChild;
+
+                    Log.Debug("Matching Text from WitchCultTranslations");
+
+                    title = Regex.Replace(r.InnerText, @"[#-&]+\d+;", "");
+                    link = r.GetAttributeValue("href", null);
+
+                    if (title is null)
+                    {
+                        Log.Warning("Could not locate The latest post from WitchCultTranslation's title");
+                        throw new InvalidDataException("Could not locate The latest post from WitchCultTranslation's title");
+                    }
+                    if (link is null)
+                    {
+                        Log.Warning("Could not locate The latest post from WitchCultTranslation's link");
+                        throw new InvalidDataException("Could not locate The latest post from WitchCultTranslation's link");
+                    }
+
+
+                    if (title == LastUpload)
+                    {
+                        Log.Information("Succesfully checked WitchCultTranslations.");
+                        break;
+                    }
+
+                    if (i == 0)
+                        latest = title;
+
+                    Log.Information("New upload from WitchCultTranslations detected, notifying");
+                    Stack.Push($"New Upload: [*{title}*]({link})");
                 }
-                if (link is null)
+
+                if(latest is not null)
                 {
-                    Log.Warning("Could not locate The latest post from WitchCultTranslation's link");
-                    throw new InvalidDataException("Could not locate The latest post from WitchCultTranslation's link");
+                    Log.Debug("Updating LastUpload information");
+                    LastUpload = latest;
+                    Serialization.Serialize.Json(LastUpload, LastPostDir, LastPostFile);
                 }
 
-                if (title == LastUpload)
-                {
-                    Log.Information("Succesfully checked WitchCultTranslations. No updates.");
-                    return;
-                }
-
-                Log.Information("New upload from WitchCultTranslations detected, notifying"); 
-                OutputBot.SendTextMessage(WitchCultChatID, $"New Upload: [*{title}*]({link})", Telegram.Bot.Types.Enums.ParseMode.MarkdownV2);
-
-                Log.Debug("Updating LastUpload information");
-                LastUpload = title;
-                Serialization.Serialize.Json(LastUpload, LastPostDir, LastPostFile);
+                while(Stack.Count > 0)
+                    OutputBot.SendTextMessage(WitchCultChatID, Stack.Pop(), Telegram.Bot.Types.Enums.ParseMode.MarkdownV2);
             }
             catch (WebException)
             {
@@ -84,6 +108,7 @@ namespace DiegoG.WebWatcher
             }
             catch (Exception) { }
             Directory.CreateDirectory(LastPostDir);
+            Serialization.Serialize.Json("Arc 7, Chapter 11 \u2013 Lifeblood Ritual", LastPostDir, LastPostFile);
         }
     }
 }

@@ -21,5 +21,6 @@
     <ProjectReference Include="..\..\DGUtilities\DiegoG.TelegramBot\DiegoG.TelegramBot.csproj" />
     <ProjectReference Include="..\..\DGUtilities\DiegoG.Utilities.Basic\DiegoG.Utilities.Basic.csproj" />
     <ProjectReference Include="..\..\DGUtilities\DiegoG.Utilities.Serialization\DiegoG.Utilities.Serialization.csproj" />
+    <ProjectReference Include="..\WebWatcherLibrary\WebWatcherLibrary.csproj" />
   </ItemGroup>
 </Project>

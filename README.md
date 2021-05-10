@@ -26,6 +26,10 @@ Replace `TelegramUserId` with your user id, you can find it using the @raw_data_
 
 Once the bot is up and running, type /help
 
+### Warnings
+Currently, Erai-raws watcher only works on Linux Systems with transmission-cli installed. I tried to make it adjustable, but it proved too complicated for the time I can put into this project.
+You can easily disable this watcher. (It's already disabled, since it's not complete)
+
 ### Output channels
 This project is hardwired to sink logs and WCT data into specific channels. 
 - The WCT Channel Id is in WitchCultTranslationsWatcher class as a `const`

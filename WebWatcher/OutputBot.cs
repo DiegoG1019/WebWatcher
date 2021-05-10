@@ -87,10 +87,29 @@ namespace DiegoG.WebWatcher
             Client.OnMessage += Client_OnMessage;
 
             BotMessageThread.Start();
+
+            BotCommandProcessor.CommandCalled += (s,e) =>
+            {
+                var c = e.Arguments[0];
+                var u = e.User.Id;
+                var dir = Service.DaemonStatistics.TotalCommandsExecutedPerUser;
+
+                if (!dir.ContainsKey(c))
+                    dir.Add(c, new());
+
+                if (!dir[c].ContainsKey(u))
+                    dir[c].Add(u, 0);
+
+                dir[c][u]++;
+            };
         }
 
         public static void StartReceiving(UpdateType[] updateTypes) => Client.StartReceiving(updateTypes);
-        public static void StopReceiving() => Client.StopReceiving();
+        public static void StopReceiving()
+        {
+            if(Client is not null && Client.IsReceiving)
+                Client.StopReceiving();
+        }
 
         internal static bool GetAdmin(int user, [NotNullWhen(true)]out AdminUser? admin)
         {
@@ -101,7 +120,7 @@ namespace DiegoG.WebWatcher
         private static void Client_OnMessage(object? sender, Telegram.Bot.Args.MessageEventArgs e)
         {
             var user = e.Message.From;
-            Log.Information($"New Message from user {user}");
+            Log.Information($"New Message from user {user}, chatId: {e.Message.Chat.Id}");
             Log.Debug($"{user} Sent: {e.Message.Text}");
             if (!AccessList.Any(u=>u.User == user.Id))
             {
@@ -116,7 +135,7 @@ namespace DiegoG.WebWatcher
         public static void SendTextMessage(
             ChatId chatId,
             string text,
-            Telegram.Bot.Types.Enums.ParseMode parseMode = Telegram.Bot.Types.Enums.ParseMode.Default,
+            ParseMode parseMode = ParseMode.Default,
             bool disableWebPreview = false,
             bool disableNotification = false,
             int replyToMessageId = 0,

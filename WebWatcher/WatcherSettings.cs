@@ -12,9 +12,11 @@ namespace DiegoG.WebWatcher
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         public string SettingsType => "DiegoG.WebWatcher.Secrets";
-        public ulong Version => 0;
+        public ulong Version => 1;
         public Serilog.Events.LogEventLevel LogEventLevel { get; set; } = Serilog.Events.LogEventLevel.Information;
         public string? BotAPIKey { get; set; }
+
+        public IDictionary<string, bool> EnableList { get; set; } = new Dictionary<string, bool>();
 
         public WatcherSettings()
         {

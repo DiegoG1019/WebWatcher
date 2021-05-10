@@ -12,6 +12,11 @@ namespace DiegoG.WebWatcher
     public interface IWebWatcher
     {
         /// <summary>
+        /// The name of the routine
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
         /// The interval between checks
         /// </summary>
         public TimeSpan Interval { get; }

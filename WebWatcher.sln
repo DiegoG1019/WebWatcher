@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.TelegramBot", "..\DG
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.Utilities.Base", "..\DGUtilities\DiegoG.Utilities.Base\DiegoG.Utilities.Base.csproj", "{515FEFBE-3CEF-4EA2-939A-0A4E771D84AA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebWatcherLibrary", "WebWatcherLibrary\WebWatcherLibrary.csproj", "{5BE79816-A377-4A55-BDC7-35E09A2C2B0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{515FEFBE-3CEF-4EA2-939A-0A4E771D84AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{515FEFBE-3CEF-4EA2-939A-0A4E771D84AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{515FEFBE-3CEF-4EA2-939A-0A4E771D84AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BE79816-A377-4A55-BDC7-35E09A2C2B0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BE79816-A377-4A55-BDC7-35E09A2C2B0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BE79816-A377-4A55-BDC7-35E09A2C2B0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BE79816-A377-4A55-BDC7-35E09A2C2B0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -13,6 +13,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using System.Text.RegularExpressions;
 using System.Collections.Concurrent;
+using DiegoG.TelegramBot;
 
 namespace DiegoG.WebWatcher
 {
@@ -59,7 +60,7 @@ namespace DiegoG.WebWatcher
                                 {
                                     await Client.SendTextMessageAsync(Id, msg, Telegram.Bot.Types.Enums.ParseMode.MarkdownV2, false, true);
                                 }
-                                catch (Exception)
+                                catch (Exception e)
                                 {
                                     const string Delayed = " !!delayed";
                                     int d = 1;
@@ -109,7 +110,7 @@ namespace DiegoG.WebWatcher
         public void Emit(LogEvent logEvent)
 		{
             if (AllowNewMessages && logEvent.Level >= Level)
-                MessageQueue.Enqueue($"*[{logEvent.Level}]:* {logEvent.RenderMessage().Replace("-", @"\-").Replace("#", @"\#")}\n\\{{{DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt zzz").Replace("-", @"\-")}\\}}");
+                MessageQueue.Enqueue($"*[{logEvent.Level}]:* {logEvent.RenderMessage()}\n\\{{{DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt zzz")}\\}}".TelegramLegalizeMarkupV2());
 	    }
     }
 }

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>DiegoG.WebWatcherLibrary</AssemblyName>
+    <RootNamespace>DiegoG.WebWatcher</RootNamespace>
+  </PropertyGroup>
+
+</Project>
