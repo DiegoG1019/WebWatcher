@@ -18,7 +18,7 @@ namespace DiegoG.WebWatcher
     public static class Program
     {
         public static TimeSpan RunningTime => RunningTimeWatch.Elapsed;
-        public readonly static Version Version = new(0, 0, 7, 1);
+        public readonly static Version Version = new(0, 0, 7, 2);
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private static IHost ProgramHost;
