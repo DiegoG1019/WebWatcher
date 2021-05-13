@@ -11,6 +11,7 @@ using System.Diagnostics;
 using DiegoG.TelegramBot;
 using Telegram.Bot.Types.Enums;
 using System.Net.Http;
+using DiegoG.Utilities.Reflection;
 
 namespace DiegoG.WebWatcher
 {
@@ -69,6 +70,8 @@ namespace DiegoG.WebWatcher
 
         public static void Initialize(string[] args)
         {
+            ExtensionLoader.Initialize(Directories.Extensions, "DiegoG.WebWatcher.AppDoamin");
+
             OutputBot.Initialize();
 
             BotCommandProcessor.Initialize(OutputBot.SendTextMessage);

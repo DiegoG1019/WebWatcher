@@ -11,13 +11,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.Utilities.Basic", ".
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.Utilities.Collections", "..\DGUtilities\DiegoG.Utilities.Collections\DiegoG.Utilities.Collections.csproj", "{E429547E-E82F-4B91-833D-4A3345AF3F13}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.CLI", "..\DGUtilities\DiegoG.CLI\DiegoG.CLI.csproj", "{BB184765-591B-4EB8-B44E-7B11F83EA0A9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.TelegramBot", "..\DGUtilities\DiegoG.TelegramBot\DiegoG.TelegramBot.csproj", "{DA4BF19C-3D6B-4B29-BF96-E1BAB51EAE67}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.Utilities.Base", "..\DGUtilities\DiegoG.Utilities.Base\DiegoG.Utilities.Base.csproj", "{515FEFBE-3CEF-4EA2-939A-0A4E771D84AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebWatcherLibrary", "WebWatcherLibrary\WebWatcherLibrary.csproj", "{5BE79816-A377-4A55-BDC7-35E09A2C2B0C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebWatcherLibrary", "WebWatcherLibrary\WebWatcherLibrary.csproj", "{5BE79816-A377-4A55-BDC7-35E09A2C2B0C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.Utilities.Reflection", "..\DGUtilities\DiegoG.Utilities.Reflection\DiegoG.Utilities.Reflection.csproj", "{732A698D-6C3E-4BB2-BCA7-A0B98C85110E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +41,6 @@ Global
 		{E429547E-E82F-4B91-833D-4A3345AF3F13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E429547E-E82F-4B91-833D-4A3345AF3F13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E429547E-E82F-4B91-833D-4A3345AF3F13}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BB184765-591B-4EB8-B44E-7B11F83EA0A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BB184765-591B-4EB8-B44E-7B11F83EA0A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BB184765-591B-4EB8-B44E-7B11F83EA0A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB184765-591B-4EB8-B44E-7B11F83EA0A9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DA4BF19C-3D6B-4B29-BF96-E1BAB51EAE67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA4BF19C-3D6B-4B29-BF96-E1BAB51EAE67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA4BF19C-3D6B-4B29-BF96-E1BAB51EAE67}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -57,6 +53,10 @@ Global
 		{5BE79816-A377-4A55-BDC7-35E09A2C2B0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BE79816-A377-4A55-BDC7-35E09A2C2B0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BE79816-A377-4A55-BDC7-35E09A2C2B0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{732A698D-6C3E-4BB2-BCA7-A0B98C85110E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{732A698D-6C3E-4BB2-BCA7-A0B98C85110E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{732A698D-6C3E-4BB2-BCA7-A0B98C85110E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{732A698D-6C3E-4BB2-BCA7-A0B98C85110E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

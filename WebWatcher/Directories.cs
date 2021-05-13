@@ -13,6 +13,7 @@ namespace DiegoG.WebWatcher
         public readonly static string Configuration = Path.Combine(EnvDataDir, ".config");
         public readonly static string Data = Path.Combine(EnvDataDir, ".data");
         public readonly static string Logs = Path.Combine(EnvDataDir, ".logs");
+        public readonly static string Extensions = Path.Combine(EnvDataDir, "extensions");
 
         public static string InConfiguration(params string[] path)
             => Path.Combine(Configuration, Path.Combine(path));
@@ -22,5 +23,8 @@ namespace DiegoG.WebWatcher
 
         public static string InLogs(params string[] path)
             => Path.Combine(Logs, Path.Combine(path));
+
+        public static string InExtenstions(params string[] path)
+            => Path.Combine(Extensions, Path.Combine(path));
     }
 }
