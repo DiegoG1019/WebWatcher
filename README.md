@@ -34,21 +34,14 @@ In order to compile a new extension, simply create a new project that references
 
 Extensions are loaded at startup before commands and watchers are loaded, but after Serilog
 
-### Warnings
-Currently, Erai-raws watcher only works on Linux Systems with transmission-cli installed. I tried to make it adjustable, but it proved too complicated for the time I can put into this project.
-You can easily disable this watcher. (It's already disabled, since it's not complete)
-
 ### Output channels
-This project is hardwired to sink logs and WCT data into specific channels. 
-- The WCT Channel Id is in WitchCultTranslationsWatcher class as a `const`
 - The log channel id is in `Program.cs` in the log configuration Chain Call
 Make sure to comment the registration of WCT Watcher and Telegram Bot sinks, or else you will face plenty of errors.
 Alternatively, you can add your bot to channels you own and use their Id instead.
 
 ### Watch Routines
 
-In order to make more Watch routines, simply create a class that implements IWebWatcher and register it along the others in `Program.cs`
-(I'm in the works of making it attribute reflection based, but that's on hold for now)
+In order to make more Watch routines, simply create a class that implements IWebWatcher and decorate it with the `Watcher` attribute
 
 ### Bot commands
 
@@ -65,6 +58,24 @@ Commands:
 6. `sudo systemctl start WebWatcher` to start the service
 8. OPTIONAL: After a few seconds, `sudo systemctl status WebWatcher` to verify the status of the service.
 
+## My Extensions
+These are two extension projects made by me, for the original purposes I made this program for.
+
+### Media Watchers
+A set of watchers designed to keep me updated on the latest releases of certain things of my interest.
+
+#### Erai-raws watcher
+Currently, Erai-raws watcher only works on Linux Systems with transmission-cli installed. I tried to make it adjustable, but it proved too complicated for the time I can put into this project.
+You can easily disable this watcher. (It's already disabled, since it's not complete)
+This is doubtful to be of any particular interest to anyone but me, since it'll just be filtering out releases of specific series
+
+#### WitchCultTranslations watcher
+This project is hardwired to sink logs and WCT data into specific channels. Since I'll have it running 24/7, there's no need for you to run this in your own fork, unless you make changes to it
+- The WCT Channel Id is in WitchCultTranslationsWatcher class as a `const`
+- The channel in question is [WitchCultTranslations](https://t.me/WitchCultTranslations)
+
+### Server Watchers
+I have yet to implement the first one, but in my head, the first things I'll do is to make a tool I can check my personal server's status with through telegram (So I can check it from wherever I am without having to port forward, or open my already noob-designed, and rather weak server to more potential attacks)
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
