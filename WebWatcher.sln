@@ -19,6 +19,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebWatcherLibrary", "WebWat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.Utilities.Reflection", "..\DGUtilities\DiegoG.Utilities.Reflection\DiegoG.Utilities.Reflection.csproj", "{732A698D-6C3E-4BB2-BCA7-A0B98C85110E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebWatcherProjects", "WebWatcherProjects", "{22765CA6-D1A0-4CD0-95FC-50E9E77CC64A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaWatchers", "MediaWatchers\MediaWatchers.csproj", "{4A08383B-BE41-4264-A1C8-B8090CDB4A49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,9 +61,18 @@ Global
 		{732A698D-6C3E-4BB2-BCA7-A0B98C85110E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{732A698D-6C3E-4BB2-BCA7-A0B98C85110E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{732A698D-6C3E-4BB2-BCA7-A0B98C85110E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A08383B-BE41-4264-A1C8-B8090CDB4A49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A08383B-BE41-4264-A1C8-B8090CDB4A49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A08383B-BE41-4264-A1C8-B8090CDB4A49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A08383B-BE41-4264-A1C8-B8090CDB4A49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1B7F7A10-EE0B-43EB-9EDC-28C9876CAE08} = {22765CA6-D1A0-4CD0-95FC-50E9E77CC64A}
+		{5BE79816-A377-4A55-BDC7-35E09A2C2B0C} = {22765CA6-D1A0-4CD0-95FC-50E9E77CC64A}
+		{4A08383B-BE41-4264-A1C8-B8090CDB4A49} = {22765CA6-D1A0-4CD0-95FC-50E9E77CC64A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4F248EB6-89BA-46FB-A60F-08F93F5833EB}

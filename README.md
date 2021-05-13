@@ -30,6 +30,8 @@ Once the bot is up and running, type /help
 Following an update to DGUtilities, the app should now support extension loading, though it's still largely untested, and no security measures are in place.
 By default, all new extensions are found and added to `ExtensionEnable` in settings, and are, by default, set to `false`, meaning they won't be loaded. You can fix this by diving into your settings.
 
+In order to compile a new extension, simply create a new project that references WebWatcher, build it (preferably in Release mode), dive into the `bin` folder and grab the .dll
+
 Extensions are loaded at startup before commands and watchers are loaded, but after Serilog
 
 ### Warnings

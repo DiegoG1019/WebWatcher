@@ -191,7 +191,7 @@ namespace DiegoG.WebWatcher
             Type? curtype = null;
             try
             {
-                foreach (var ty in ReflectionCollectionMethods.GetAllTypesWithAttributeInAssemblies(typeof(WatcherAttribute), false, Assembly.GetExecutingAssembly()))
+                foreach (var ty in ReflectionCollectionMethods.GetAllTypesWithAttributeInAssemblies(typeof(WatcherAttribute), false, AppDomain.CurrentDomain.GetAssemblies()))
                 {
                     curtype = ty;
                     AddWatcher(ty);

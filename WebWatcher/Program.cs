@@ -84,6 +84,11 @@ namespace DiegoG.WebWatcher
             {
                 if (!settings.ExtensionsEnable.ContainsKey(s))
                     settings.ExtensionsEnable.Add(s, false);
+
+                var r = settings.ExtensionsEnable[s];
+
+                Log.Information(r ? $"Extension {s} is enabled, queuing." : $"Extension {s} is disabled, ignoring.");
+
                 return settings.ExtensionsEnable[s];
             }));
 
@@ -91,6 +96,9 @@ namespace DiegoG.WebWatcher
             OutputBot.OnMessage += BotCommandProcessor.Bot_OnMessage;
 
             Service.LoadWatchers();
+
+            Settings<WatcherSettings>.SaveSettings();
+
             ProgramHost = CreateHostBuilder(args).Build();
         }
 
