@@ -18,7 +18,7 @@ namespace DiegoG.WebWatcher
     public static class Program
     {
         public static TimeSpan RunningTime => RunningTimeWatch.Elapsed;
-        public readonly static Version Version = new(0, 0, 7, 0);
+        public readonly static Version Version = new(0, 0, 7, 1);
         public readonly static string VersionName = "Main";
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -30,11 +30,7 @@ namespace DiegoG.WebWatcher
         {
             RunningTimeWatch.Start();
 
-
-            Settings<WatcherSettings>.Initialize(Directories.Configuration, "settings.cfg", true, null, s =>
-            {
-                s.EnableList ??= new Dictionary<string, bool>();
-            });
+            Settings<WatcherSettings>.Initialize(Directories.Configuration, "settings.cfg", true, null, s => { });
 
             if (Settings<WatcherSettings>.Current.BotAPIKey is null)
                 throw new InvalidDataException("Settings file is invalid. Please fill out the BotAPIKey field");
@@ -75,9 +71,6 @@ namespace DiegoG.WebWatcher
 
             OutputBot.Initialize();
 
-            BotCommandProcessor.Initialize(OutputBot.SendTextMessage);
-            OutputBot.OnMessage += BotCommandProcessor.Bot_OnMessage;
-
             var settings = Settings<WatcherSettings>.Current;
 
             Log.Logger = new LoggerConfiguration()
@@ -86,6 +79,16 @@ namespace DiegoG.WebWatcher
                 .WriteTo.File(Directories.InLogs(".log"), rollingInterval: RollingInterval.Hour, restrictedToMinimumLevel: settings.FileLogEventLevel)
                 .WriteTo.TelegramBot(-1001445070822, OutputBot.Client, settings.BotLogEventLevel)
                 .CreateLogger();
+
+            ExtensionLoader.Load(ExtensionLoader.EnumerateUnloadedAssemblies().Where(s =>
+            {
+                if (!settings.ExtensionsEnable.ContainsKey(s))
+                    settings.ExtensionsEnable.Add(s, false);
+                return settings.ExtensionsEnable[s];
+            }));
+
+            BotCommandProcessor.Initialize(OutputBot.SendTextMessage);
+            OutputBot.OnMessage += BotCommandProcessor.Bot_OnMessage;
 
             Service.LoadWatchers();
             ProgramHost = CreateHostBuilder(args).Build();
