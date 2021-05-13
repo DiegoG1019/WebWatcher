@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using DiegoG.TelegramBot.Types;
 using DiegoG.Utilities.Collections;
 using DiegoG.Utilities.IO;
+using DiegoG.Utilities.Reflection;
 using Telegram.Bot.Types;
 
 namespace DiegoG.WebWatcher.BotCommands
