@@ -148,7 +148,10 @@ namespace DiegoG.WebWatcher
 
         public static async Task Active(CancellationToken token)
         {
-            Log.Information($"Started Running WebWatcher v.{Program.Version} - {Program.VersionName}");
+            {
+                var setts = Settings<WatcherSettings>.Current;
+                Log.Information($"Started Running WebWatcher v.{Program.Version} ${(setts.VersionName is not null ? $"- {setts.VersionName}" : "")}");
+            }
             AsyncTaskManager tasks = new();
             Log.Information("Starting Daemon");
 

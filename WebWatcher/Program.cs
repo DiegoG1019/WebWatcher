@@ -19,7 +19,6 @@ namespace DiegoG.WebWatcher
     {
         public static TimeSpan RunningTime => RunningTimeWatch.Elapsed;
         public readonly static Version Version = new(0, 0, 7, 1);
-        public readonly static string VersionName = "Main";
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private static IHost ProgramHost;
@@ -82,6 +81,7 @@ namespace DiegoG.WebWatcher
 
             ExtensionLoader.Load(ExtensionLoader.EnumerateUnloadedAssemblies().Where(s =>
             {
+                s = Path.GetFileName(s);
                 if (!settings.ExtensionsEnable.ContainsKey(s))
                     settings.ExtensionsEnable.Add(s, false);
 
