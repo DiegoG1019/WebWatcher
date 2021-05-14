@@ -18,7 +18,7 @@ namespace DiegoG.WebWatcher
     public static class Program
     {
         public static TimeSpan RunningTime => RunningTimeWatch.Elapsed;
-        public readonly static Version Version = new(0, 0, 7, 2);
+        public readonly static Version Version = new(0, 0, 7, 5);
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private static IHost ProgramHost;
@@ -34,38 +34,6 @@ namespace DiegoG.WebWatcher
             if (Settings<WatcherSettings>.Current.BotAPIKey is null)
                 throw new InvalidDataException("Settings file is invalid. Please fill out the BotAPIKey field");
 
-            Initialize(args);
-
-            while (true)
-            {
-                try
-                {
-                    await OutputBot.Client.SetMyCommandsAsync(BotCommandProcessor.CommandList.AvailableCommands);
-                    OutputBot.StartReceiving(new[] { UpdateType.Message });
-                    ProgramHost.Run();
-                }
-                catch (HttpRequestException)
-                {
-                    Log.Warning($"Caught an HTTP Request Exception, waiting {NetworkWait.TotalSeconds} seconds and trying again");
-                    OutputBot.StopReceiving();
-                    await Task.Delay(NetworkWait);
-                }
-#if !DEBUG
-                catch(Exception e)
-                {
-                    Log.Fatal($"Unhandled Exception Caught at Main {e.Message}");
-                    Log.Fatal(e, e.GetType().Name);
-                    Log.CloseAndFlush();
-                    Console.WriteLine($"Unhandled Exception Caught at Main {e.Message}:\n{e}");
-                    throw;
-                }
-#endif
-            }
-        }
-
-
-        public static void Initialize(string[] args)
-        {
             ExtensionLoader.Initialize(Directories.Extensions);
 
             OutputBot.Initialize();
@@ -103,6 +71,32 @@ namespace DiegoG.WebWatcher
             Settings<WatcherSettings>.SaveSettings();
 
             ProgramHost = CreateHostBuilder(args).Build();
+
+            while (true)
+            {
+                try
+                {
+                    await OutputBot.Client.SetMyCommandsAsync(BotCommandProcessor.CommandList.AvailableCommands);
+                    OutputBot.StartReceiving(new[] { UpdateType.Message });
+                    ProgramHost.Run();
+                }
+                catch (HttpRequestException)
+                {
+                    Log.Warning($"Caught an HTTP Request Exception, waiting {NetworkWait.TotalSeconds} seconds and trying again");
+                    OutputBot.StopReceiving();
+                    await Task.Delay(NetworkWait);
+                }
+#if !DEBUG
+                catch(Exception e)
+                {
+                    Log.Fatal($"Unhandled Exception Caught at Main {e.Message}");
+                    Log.Fatal(e, e.GetType().Name);
+                    Log.CloseAndFlush();
+                    Console.WriteLine($"Unhandled Exception Caught at Main {e.Message}:\n{e}");
+                    throw;
+                }
+#endif
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
