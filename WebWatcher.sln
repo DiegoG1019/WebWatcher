@@ -21,9 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiegoG.Utilities.Reflection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebWatcherProjects", "WebWatcherProjects", "{22765CA6-D1A0-4CD0-95FC-50E9E77CC64A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaWatchers", "MediaWatchers\MediaWatchers.csproj", "{4A08383B-BE41-4264-A1C8-B8090CDB4A49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaWatchers", "MediaWatchers\MediaWatchers.csproj", "{4A08383B-BE41-4264-A1C8-B8090CDB4A49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerWatchers", "ServerWatchers\ServerWatchers.csproj", "{C3671284-DA6E-46FF-91A6-D4B4863DF3F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerWatchers", "ServerWatchers\ServerWatchers.csproj", "{C3671284-DA6E-46FF-91A6-D4B4863DF3F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtraUtilities", "ExtraUtilities\ExtraUtilities.csproj", "{4A4BDD69-9EF0-48C8-BFBD-3E043062DF19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,10 @@ Global
 		{C3671284-DA6E-46FF-91A6-D4B4863DF3F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3671284-DA6E-46FF-91A6-D4B4863DF3F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3671284-DA6E-46FF-91A6-D4B4863DF3F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A4BDD69-9EF0-48C8-BFBD-3E043062DF19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A4BDD69-9EF0-48C8-BFBD-3E043062DF19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A4BDD69-9EF0-48C8-BFBD-3E043062DF19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A4BDD69-9EF0-48C8-BFBD-3E043062DF19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +86,7 @@ Global
 		{5BE79816-A377-4A55-BDC7-35E09A2C2B0C} = {22765CA6-D1A0-4CD0-95FC-50E9E77CC64A}
 		{4A08383B-BE41-4264-A1C8-B8090CDB4A49} = {22765CA6-D1A0-4CD0-95FC-50E9E77CC64A}
 		{C3671284-DA6E-46FF-91A6-D4B4863DF3F6} = {22765CA6-D1A0-4CD0-95FC-50E9E77CC64A}
+		{4A4BDD69-9EF0-48C8-BFBD-3E043062DF19} = {22765CA6-D1A0-4CD0-95FC-50E9E77CC64A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4F248EB6-89BA-46FB-A60F-08F93F5833EB}

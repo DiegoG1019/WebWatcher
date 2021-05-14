@@ -17,7 +17,6 @@ namespace DiegoG.WebWatcher
 {
     public static class Program
     {
-        public const long BotLogSinkChatId = -1001445070822;
         public static TimeSpan RunningTime => RunningTimeWatch.Elapsed;
         public readonly static Version Version = new(0, 0, 7, 2);
 
@@ -73,12 +72,15 @@ namespace DiegoG.WebWatcher
 
             var settings = Settings<WatcherSettings>.Current;
 
-            Log.Logger = new LoggerConfiguration()
+            var logconf = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.Console(settings.ConsoleLogEventLevel)
-                .WriteTo.File(Directories.InLogs(".log"), rollingInterval: RollingInterval.Hour, restrictedToMinimumLevel: settings.FileLogEventLevel)
-                .WriteTo.TelegramBot(BotLogSinkChatId, OutputBot.Client, settings.BotLogEventLevel)
-                .CreateLogger();
+                .WriteTo.File(Directories.InLogs(".log"), rollingInterval: RollingInterval.Hour, restrictedToMinimumLevel: settings.FileLogEventLevel);
+
+            if (settings.LogChatId is not null)
+                logconf.WriteTo.TelegramBot(settings.LogChatId, OutputBot.Client, settings.BotLogEventLevel);
+
+            Log.Logger = logconf.CreateLogger();
 
             ExtensionLoader.Load(ExtensionLoader.EnumerateUnloadedAssemblies().Where(s =>
             {

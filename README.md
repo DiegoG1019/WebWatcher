@@ -35,9 +35,7 @@ In order to compile a new extension, simply create a new project that references
 Extensions are loaded at startup before commands and watchers are loaded, but after Serilog
 
 ### Output channels
-- The log channel id is in `Program.cs` in the log configuration Chain Call
-Make sure to comment the Telegram Bot sink, or else you will face plenty of errors.
-Alternatively, you can add your bot to channels you own and use their Id instead.
+- The log channel id is in the settings file and is defaulted to null. Meaning it will be disabled unless otherwise configured.
 
 ### Watch Routines
 In order to make more Watch routines, simply create a class that implements IWebWatcher and decorate it with the `Watcher` attribute
@@ -87,3 +85,6 @@ This project is hardwired to sink logs and WCT data into specific channels. Sinc
 
 ### Server Watchers
 I have yet to implement the first one, but in my head, the first things I'll do is to make a tool I can check my personal server's status with through telegram (So I can check it from wherever I am without having to port forward, or open my already noob-designed, and rather weak server to more potential attacks)
+
+### Extra Utilities
+Miscelaenous things I have nowhere else to throw into
