@@ -4,7 +4,7 @@ WebWatcher is an app to periodically issue tasks related to watching a specific 
 
 ## Installation
 
-Download this Repo, as well as [DGUtilities](https://github.com/DiegoG1019/DGUtilities) and place them adjacent to each other. Then, load the WebWatcher.sln in Visual Studio, it should be able to compile then. The project is designed to run as a Linux service, but if you want to run it on Windows in release mode, simply comment out the `WriteTo.Syslog` line in `Program.cs`
+Download this Repo, as well as [DGUtilities](https://github.com/DiegoG1019/DGUtilities) and place them adjacent to each other. Then, load the WebWatcher.sln in Visual Studio, it should be able to compile then. The project is oriented to being run as a Linux service, but can run on windows without any issues
 
 ## Usage
 
@@ -34,25 +34,18 @@ In order to compile a new extension, simply create a new project that references
 
 Extensions are loaded at startup before commands and watchers are loaded, but after Serilog
 
-### Warnings
-Currently, Erai-raws watcher only works on Linux Systems with transmission-cli installed. I tried to make it adjustable, but it proved too complicated for the time I can put into this project.
-You can easily disable this watcher. (It's already disabled, since it's not complete)
-
 ### Output channels
-This project is hardwired to sink logs and WCT data into specific channels. 
-- The WCT Channel Id is in WitchCultTranslationsWatcher class as a `const`
 - The log channel id is in `Program.cs` in the log configuration Chain Call
-Make sure to comment the registration of WCT Watcher and Telegram Bot sinks, or else you will face plenty of errors.
+Make sure to comment the Telegram Bot sink, or else you will face plenty of errors.
 Alternatively, you can add your bot to channels you own and use their Id instead.
 
 ### Watch Routines
-
-In order to make more Watch routines, simply create a class that implements IWebWatcher and register it along the others in `Program.cs`
-(I'm in the works of making it attribute reflection based, but that's on hold for now)
+In order to make more Watch routines, simply create a class that implements IWebWatcher and decorate it with the `Watcher` attribute
 
 ### Bot commands
+In order to make more Bot commands, simply make a new class that implements `IBotCommand` and decorate it with the `BotCommand` attribute.
 
-In order to make more Bot commands, simply make a new class that implements `IBotCommand` and decorate it with the `BotCommand` attribute. Nothing else needs to be done. You can even replace /help and /start, as all commands are loaded first and then, if they're not found, they're defaulted. If they're found, yours will be used instead.
+You can even replace /help and /start, as all commands are loaded first and then, if they're not found, they're defaulted. If they're found, yours will be used instead.
 
 ### Run as a service
 In order to run this app as a service, take a look at the `WebWatcher.service` systemd service file template
@@ -65,6 +58,8 @@ Commands:
 6. `sudo systemctl start WebWatcher` to start the service
 8. OPTIONAL: After a few seconds, `sudo systemctl status WebWatcher` to verify the status of the service.
 
+Alternatively, you can also:
+4. `sudo ln -s WebWatcher/WebWatcher.service /etc/systemd/system/WebWatcher.service` to create a symlink to the file. This way, if you make any changes, you won't have to `cp` again
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
@@ -73,3 +68,22 @@ Please make sure to update tests as appropriate.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
+
+## My Extensions
+These are two extension projects made by me, for the original purposes I made this program for.
+
+### Media Watchers
+A set of watchers designed to keep me updated on the latest releases of certain things of my interest.
+
+#### Erai-raws watcher
+Currently, Erai-raws watcher only works on Linux Systems with transmission-cli installed. I tried to make it adjustable, but it proved too complicated for the time I can put into this project.
+You can easily disable this watcher. (It's already disabled, since it's not complete)
+This is doubtful to be of any particular interest to anyone but me, since it'll just be filtering out releases of specific series
+
+#### WitchCultTranslations watcher
+This project is hardwired to sink logs and WCT data into specific channels. Since I'll have it running 24/7, there's no need for you to run this in your own fork, unless you make changes to it
+- The WCT Channel Id is in WitchCultTranslationsWatcher class as a `const`
+- The channel in question is [WitchCultTranslations](https://t.me/WitchCultTranslations)
+
+### Server Watchers
+I have yet to implement the first one, but in my head, the first things I'll do is to make a tool I can check my personal server's status with through telegram (So I can check it from wherever I am without having to port forward, or open my already noob-designed, and rather weak server to more potential attacks)
