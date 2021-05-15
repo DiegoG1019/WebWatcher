@@ -12,6 +12,7 @@ using DiegoG.TelegramBot;
 using Telegram.Bot.Types.Enums;
 using System.Net.Http;
 using DiegoG.Utilities.Reflection;
+using Telegram.Bot.Exceptions;
 
 namespace DiegoG.WebWatcher
 {
@@ -36,6 +37,12 @@ namespace DiegoG.WebWatcher
 
             ExtensionLoader.Initialize(Directories.Extensions);
 
+            static async Task WaitAndTryAgain(Exception e)
+            {
+                Log.Warning($"Caught: {e.GetType().Name}: {e.Message}\nwaiting {NetworkWait.TotalSeconds} seconds and trying again");
+                OutputBot.StopReceiving();
+                await Task.Delay(NetworkWait);
+            }
             while (true)
             {
                 try
@@ -44,11 +51,13 @@ namespace DiegoG.WebWatcher
                     OutputBot.Initialize();
                     break;
                 }
-                catch (HttpRequestException)
+                catch (HttpRequestException e)
                 {
-                    Log.Warning($"Caught an HTTP Request Exception, waiting {NetworkWait.TotalSeconds} seconds and trying again");
-                    OutputBot.StopReceiving();
-                    await Task.Delay(NetworkWait);
+                    await WaitAndTryAgain(e);
+                }
+                catch (ApiRequestException e)
+                {
+                    await WaitAndTryAgain(e);
                 }
             }
 
