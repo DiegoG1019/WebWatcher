@@ -68,23 +68,4 @@ Please make sure to update tests as appropriate.
 [MIT](https://choosealicense.com/licenses/mit/)
 
 ## My Extensions
-These are two extension projects made by me, for the original purposes I made this program for.
-
-### Media Watchers
-A set of watchers designed to keep me updated on the latest releases of certain things of my interest.
-
-#### Erai-raws watcher
-Currently, Erai-raws watcher only works on Linux Systems with transmission-cli installed. I tried to make it adjustable, but it proved too complicated for the time I can put into this project.
-You can easily disable this watcher. (It's already disabled, since it's not complete)
-This is doubtful to be of any particular interest to anyone but me, since it'll just be filtering out releases of specific series
-
-#### WitchCultTranslations watcher
-This project is hardwired to sink logs and WCT data into specific channels. Since I'll have it running 24/7, there's no need for you to run this in your own fork, unless you make changes to it
-- The WCT Channel Id is in WitchCultTranslationsWatcher class as a `const`
-- The channel in question is [WitchCultTranslations](https://t.me/WitchCultTranslations)
-
-### Server Watchers
-I have yet to implement the first one, but in my head, the first things I'll do is to make a tool I can check my personal server's status with through telegram (So I can check it from wherever I am without having to port forward, or open my already noob-designed, and rather weak server to more potential attacks)
-
-### Extra Utilities
-Miscelaenous things I have nowhere else to throw into
+These are extensions I made for my personal use of the WebWatcher. Check them out [here](https://github.com/DiegoG1019/WatcherExtensions)
