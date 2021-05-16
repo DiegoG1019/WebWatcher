@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +33,16 @@ namespace DiegoG.WebWatcher
         /// </summary>
         /// <returns></returns>
         public Task FirstCheck();
+
+        /// <summary>
+        /// Validates that the current instance of WebWatcher is valid. Can be used to check for version
+        /// </summary>
+        /// <returns></returns>
+        public bool Validate([NotNullWhen(false)]out string failuremessage)
+        {
+            failuremessage = null;
+            return true;
+        }
 
         public bool Equals(object other)
             => ReferenceEquals(this, other);

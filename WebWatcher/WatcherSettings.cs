@@ -20,7 +20,7 @@ namespace DiegoG.WebWatcher
 
         public string? VersionName { get; set; } = "";
 
-        public long? LogChatId { get; set; } = null;
+        public long LogChatId { get; set; } = 0;
 
         public IDictionary<string, bool> EnableList { get; set; } = new Dictionary<string, bool>();
 

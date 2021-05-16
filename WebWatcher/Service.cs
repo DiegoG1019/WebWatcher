@@ -100,6 +100,12 @@ namespace DiegoG.WebWatcher
             else
                 return;
 
+            if(!watcher.Validate(out var msg))
+            {
+                Log.Error($"Failed to load watcher {watcher.Name}: {msg}");
+                return;
+            }
+
             WatcherTimerPair pair = new(
                 watcher,
                 pair => ActionQueue.Enqueue(() =>

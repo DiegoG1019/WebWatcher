@@ -19,7 +19,7 @@ namespace DiegoG.WebWatcher
     public static class Program
     {
         public static TimeSpan RunningTime => RunningTimeWatch.Elapsed;
-        public readonly static Version Version = new(0, 0, 7, 7);
+        public readonly static Version Version = new(0, 8, 1);
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private static IHost ProgramHost;
@@ -64,23 +64,12 @@ namespace DiegoG.WebWatcher
                 .WriteTo.Console(settings.ConsoleLogEventLevel)
                 .WriteTo.File(Directories.InLogs(".log"), rollingInterval: RollingInterval.Hour, restrictedToMinimumLevel: settings.FileLogEventLevel);
 
-            if (settings.LogChatId is not null)
+            if (settings.LogChatId is not 0)
                 logconf.WriteTo.TelegramBot(settings.LogChatId, OutputBot.Client, settings.BotLogEventLevel);
 
             Log.Logger = logconf.CreateLogger();
 
-            ExtensionLoader.Load(ExtensionLoader.EnumerateUnloadedAssemblies().Where(s =>
-            {
-                s = Path.GetFileName(s);
-                if (!settings.ExtensionsEnable.ContainsKey(s))
-                    settings.ExtensionsEnable.Add(s, false);
-
-                var r = settings.ExtensionsEnable[s];
-
-                Log.Information(r ? $"Extension {s} is enabled, queuing." : $"Extension {s} is disabled, ignoring.");
-
-                return settings.ExtensionsEnable[s];
-            }));
+            LoadEnabledExtensions();
 
             BotCommandProcessor.Initialize(OutputBot.SendTextMessage);
             OutputBot.OnMessage += BotCommandProcessor.Bot_OnMessage;
@@ -116,6 +105,42 @@ namespace DiegoG.WebWatcher
                 }
 #endif
             }
+        }
+
+        public static void LoadEnabledExtensions()
+        {
+            var settings = Settings<WatcherSettings>.Current;
+            ExtensionLoader.Load(ExtensionLoader.EnumerateUnloadedAssemblies().Where(s =>
+            {
+                s = Path.GetFileName(s);
+                if (!settings.ExtensionsEnable.ContainsKey(s))
+                    settings.ExtensionsEnable.Add(s, false);
+
+                var r = settings.ExtensionsEnable[s];
+
+                Log.Information(r ? $"Extension {s} is enabled, queuing." : $"Extension {s} is disabled, ignoring.");
+
+                return settings.ExtensionsEnable[s];
+            }));
+        }
+
+        public static void LoadExtensions(params string[] names)
+        {
+            Log.Information($"Attempting to load extension {names}");
+            var settings = Settings<WatcherSettings>.Current;
+
+            var allowednames = names.Where(s => !ExtensionLoader.LoadedExtensions.Any(d => d == s));
+
+            foreach (var name in allowednames)
+                if (!settings.ExtensionsEnable.ContainsKey(Path.GetFileName(name)))
+                    settings.ExtensionsEnable.Add(Path.GetFileName(name), true);
+
+            allowednames = allowednames.Where(s => settings.ExtensionsEnable[Path.GetFileName(s)]);
+            ExtensionLoader.Load(allowednames);
+
+            Service.LoadWatchers();
+            BotCommandProcessor.LoadNewCommands(AppDomain.CurrentDomain.GetAssemblies());
+            OutputBot.Client.SetMyCommandsAsync(BotCommandProcessor.CommandList.AvailableCommands).Wait();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
