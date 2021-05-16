@@ -39,7 +39,7 @@ namespace DiegoG.WebWatcher.BotCommands
                 {
                     Task.Run(async () =>
                     {
-                        await Task.Delay(500);
+						await Task.WhenAll(new[]{ Settings<WatcherSettings>.SaveSettingsAsync(), Task.Delay(500) });
                         Environment.Exit(0);
                     });
                     Cancel(args.User);
