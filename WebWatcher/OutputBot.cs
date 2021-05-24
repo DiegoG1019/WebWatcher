@@ -69,10 +69,12 @@ namespace DiegoG.WebWatcher
                             {
                                 try
                                 {
+                                    Log.Verbose($"Sending text message to {msg.ChatId}");
                                     await Client.SendTextMessageAsync(msg.ChatId, msg.Text, msg.ParseMode, msg.DisableWebPreview, msg.DisableNotification, msg.ReplyToMessageId, msg.ReplyMarkup);
                                 }
                                 catch (Exception)
                                 {
+                                    Log.Verbose($"Could not send text message to {msg.ChatId}, Enqueueing again");
                                     MessageQueue.Enqueue(msg);
                                     await Task.Delay(TimeSpan.FromMinutes(1));
                                 }
