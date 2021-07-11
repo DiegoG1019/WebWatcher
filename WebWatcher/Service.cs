@@ -225,7 +225,7 @@ namespace DiegoG.WebWatcher
             public AverageList AverageLoopsPerSecond { get; } = new(20);
 
             public readonly Dictionary<string, ulong> TotalWatchRuns = new();
-            public readonly Dictionary<string, Dictionary<int, ulong>> TotalCommandsExecutedPerUser = new();
+            public readonly Dictionary<string, Dictionary<long, ulong>> TotalCommandsExecutedPerUser = new();
 
             public override string ToString()
                 => Serialization.Serialize.Json(this);

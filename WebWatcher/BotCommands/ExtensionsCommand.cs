@@ -1,4 +1,5 @@
-﻿using DiegoG.TelegramBot.Types;
+﻿using DiegoG.TelegramBot;
+using DiegoG.TelegramBot.Types;
 using DiegoG.Utilities.Collections;
 using DiegoG.Utilities.Reflection;
 using DiegoG.Utilities.Settings;
@@ -38,6 +39,8 @@ namespace DiegoG.WebWatcher.BotCommands
         public string Trigger => "/extensions";
 
         public string? Alias => "/ext";
+
+        public BotCommandProcessor Processor { get; set; }
 
         public Task<(string Result, bool Hold)> Action(BotCommandArguments args)
         => args.Arguments.Length == 1

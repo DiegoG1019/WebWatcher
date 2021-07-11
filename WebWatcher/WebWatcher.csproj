@@ -9,19 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.33" />
+    <PackageReference Include="DiegoG.TelegramBot" Version="1.4.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
-    <PackageReference Include="Serilog.Sinks.SyslogMessages" Version="2.0.4" />
-    <PackageReference Include="Telegram.Bot" Version="15.7.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.SyslogMessages" Version="2.0.5" />
+    <PackageReference Include="Telegram.Bot" Version="16.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DGUtilities\DiegoG.TelegramBot\DiegoG.TelegramBot.csproj" />
-    <ProjectReference Include="..\..\DGUtilities\DiegoG.Utilities.Basic\DiegoG.Utilities.Basic.csproj" />
-    <ProjectReference Include="..\..\DGUtilities\DiegoG.Utilities.Reflection\DiegoG.Utilities.Reflection.csproj" />
-    <ProjectReference Include="..\..\DGUtilities\DiegoG.Utilities.Serialization\DiegoG.Utilities.Serialization.csproj" />
     <ProjectReference Include="..\WebWatcherLibrary\WebWatcherLibrary.csproj" />
   </ItemGroup>
 </Project>

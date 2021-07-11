@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DiegoG.Utilities;
 using Telegram.Bot.Types;
 using DiegoG.TelegramBot.Types;
+using DiegoG.TelegramBot;
 
 namespace DiegoG.WebWatcher.BotCommands
 {
@@ -33,6 +34,8 @@ namespace DiegoG.WebWatcher.BotCommands
         public string Trigger { get; } = "/allow";
 
         public string? Alias => null;
+
+        public BotCommandProcessor Processor { get; set; }
 
         public Task<(string, bool)> Action(BotCommandArguments arguments)
         {

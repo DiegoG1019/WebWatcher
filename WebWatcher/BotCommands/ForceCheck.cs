@@ -1,4 +1,5 @@
-﻿using DiegoG.TelegramBot.Types;
+﻿using DiegoG.TelegramBot;
+using DiegoG.TelegramBot.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,8 @@ namespace DiegoG.WebWatcher.BotCommands
         public string Trigger => "/forcecheck";
 
         public string? Alias => null;
+
+        public BotCommandProcessor Processor { get; set; }
 
         public Task<(string Result, bool Hold)> Action(BotCommandArguments args)
         {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DiegoG.TelegramBot;
 using DiegoG.TelegramBot.Types;
 using DiegoG.Utilities.Collections;
 using DiegoG.Utilities.IO;
@@ -29,6 +30,8 @@ namespace DiegoG.WebWatcher.BotCommands
         public string Trigger => "/status";
 
         public string? Alias => null;
+
+        public BotCommandProcessor Processor { get; set; }
 
         public Task<(string, bool)> Action(BotCommandArguments arguments)
         {

@@ -23,6 +23,8 @@ namespace DiegoG.WebWatcher.BotCommands
 
         public string? Alias => null;
 
+        public BotCommandProcessor Processor { get; set; }
+
         private List<User> Held { get; } = new();
         public IEnumerable<User>? Hold => Held;
 

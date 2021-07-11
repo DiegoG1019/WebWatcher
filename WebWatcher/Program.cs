@@ -19,7 +19,7 @@ namespace DiegoG.WebWatcher
     public static class Program
     {
         public static TimeSpan RunningTime => RunningTimeWatch.Elapsed;
-        public readonly static Version Version = new(0, 8, 2);
+        public readonly static Version Version = new(0, 9, 0);
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private static IHost ProgramHost;
@@ -71,9 +71,6 @@ namespace DiegoG.WebWatcher
 
             LoadEnabledExtensions();
 
-            BotCommandProcessor.Initialize(OutputBot.SendTextMessage);
-            OutputBot.OnMessage += BotCommandProcessor.Bot_OnMessage;
-
             Service.LoadWatchers();
 
             Settings<WatcherSettings>.SaveSettings();
@@ -84,7 +81,7 @@ namespace DiegoG.WebWatcher
             {
                 try
                 {
-                    await OutputBot.Client.SetMyCommandsAsync(BotCommandProcessor.CommandList.AvailableCommands);
+                    await OutputBot.Client.SetMyCommandsAsync(OutputBot.Processor.CommandList.AvailableCommands);
                     OutputBot.StartReceiving(new[] { UpdateType.Message });
                     ProgramHost.Run();
                 }
@@ -139,8 +136,8 @@ namespace DiegoG.WebWatcher
             ExtensionLoader.Load(allowednames);
 
             Service.LoadWatchers();
-            BotCommandProcessor.LoadNewCommands(AppDomain.CurrentDomain.GetAssemblies());
-            OutputBot.Client.SetMyCommandsAsync(BotCommandProcessor.CommandList.AvailableCommands).Wait();
+            OutputBot.Processor.LoadNewCommands(AppDomain.CurrentDomain.GetAssemblies());
+            OutputBot.Client.SetMyCommandsAsync(OutputBot.Processor.CommandList.AvailableCommands).Wait();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
