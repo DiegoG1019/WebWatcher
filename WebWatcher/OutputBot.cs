@@ -73,7 +73,11 @@ namespace DiegoG.WebWatcher
             OutBot.Processor = Processor;
         }
 
-        public static void StartReceiving(UpdateType[] updateTypes) => Client.StartReceiving(updateTypes);
+        public static void StartReceiving(UpdateType[] updateTypes)
+        {
+            if(Client is not null && !Client.IsReceiving)
+                Client.StartReceiving(updateTypes);
+        }
         public static void StopReceiving()
         {
             if(Client is not null && Client.IsReceiving)

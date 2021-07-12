@@ -43,7 +43,7 @@ namespace DiegoG.WebWatcher.BotCommands
                 return Task.FromResult(("Too many arguments", false));
 
             if(args.Length == 1)
-                return Task.FromResult(($"Alive and well. Running Time: {Program.RunningTime}", false));
+                return Task.FromResult(($"Alive and well. Running Time: {Program.RunningTime}\n\nRunning WebWatcher Version {Program.Version} under Library Version {WatcherData.LibraryVersion}", false));
 
             if (args[1] == "stats")
                 return Task.Run(() =>

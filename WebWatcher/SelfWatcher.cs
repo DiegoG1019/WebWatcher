@@ -11,21 +11,19 @@ namespace DiegoG.WebWatcher
     [Watcher]
     public class StatusWatcher : IWebWatcher
     {
-        public TimeSpan Interval { get; } = TimeSpan.FromMinutes(15);
+        public TimeSpan Interval { get; } = TimeSpan.FromMinutes(5);
 
         public string Name => "StatusWatcher";
 
         public Task Check()
         {
-#if DEBUG
-            Log.Debug($"Alive and well. Running Time {Program.RunningTime}");
-#else
-            Log.Verbose($"Alive and well. Running Time {Program.RunningTime}");
-#endif
-
             return Settings<WatcherSettings>.SaveSettingsAsync();
         }
 
-        public Task FirstCheck() => Task.CompletedTask;
+        public Task FirstCheck()
+        {
+            OutBot.EnqueueAction(b => b.SetMyCommandsAsync(OutBot.Processor.CommandList.AvailableCommands));
+            return Task.CompletedTask;
+        }
     }
 }

@@ -7,11 +7,11 @@
     <Authors>DiegoG1019</Authors>
     <Description>A library to create extensions for https://github.com/DiegoG1019/WebWatcher</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.5</Version>
+    <Version>1.0.7</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DiegoG.TelegramBot" Version="1.4.0" />
+    <PackageReference Include="DiegoG.TelegramBot" Version="1.4.2" />
     <PackageReference Include="DiegoG.Utilities.Basic" Version="1.0.2" />
     <PackageReference Include="DiegoG.Utilities.Collections" Version="1.0.0" />
     <PackageReference Include="DiegoG.Utilities.Reflection" Version="1.1.2" />

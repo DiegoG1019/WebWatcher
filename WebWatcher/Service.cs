@@ -156,7 +156,7 @@ namespace DiegoG.WebWatcher
         {
             {
                 var setts = Settings<WatcherSettings>.Current;
-                Log.Information($"Started Running WebWatcher v.{Program.Version} ${(setts.VersionName is not null ? $"- {setts.VersionName}" : "")}");
+                Log.Information($"Started Running WebWatcher v.{Program.Version} {(setts.VersionName is not null ? $"- {setts.VersionName}" : "")}");
             }
             AsyncTaskManager tasks = new();
             Log.Information("Starting Daemon");

@@ -19,7 +19,7 @@ namespace DiegoG.WebWatcher
     public static class Program
     {
         public static TimeSpan RunningTime => RunningTimeWatch.Elapsed;
-        public readonly static Version Version = new(0, 9, 0);
+        public readonly static Version Version = new(0, 10, 4);
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private static IHost ProgramHost;
@@ -65,13 +65,16 @@ namespace DiegoG.WebWatcher
                 .WriteTo.File(Directories.InLogs(".log"), rollingInterval: RollingInterval.Hour, restrictedToMinimumLevel: settings.FileLogEventLevel);
 
             if (settings.LogChatId is not 0)
-                logconf.WriteTo.TelegramBot(settings.LogChatId, OutputBot.Client, settings.BotLogEventLevel, settings.VersionName);
+                logconf.WriteTo.TelegramBot(settings.LogChatId, OutputBot.Processor, settings.BotLogEventLevel, settings.VersionName);
 
             Log.Logger = logconf.CreateLogger();
 
             LoadEnabledExtensions();
 
             Service.LoadWatchers();
+            OutputBot.Processor.LoadNewCommands(AppDomain.CurrentDomain.GetAssemblies());
+
+            OutputBot.Processor.MessageQueue.ApiSaturationLimit = 20;
 
             Settings<WatcherSettings>.SaveSettings();
 
@@ -81,14 +84,11 @@ namespace DiegoG.WebWatcher
             {
                 try
                 {
-                    await OutputBot.Client.SetMyCommandsAsync(OutputBot.Processor.CommandList.AvailableCommands);
-                    OutputBot.StartReceiving(new[] { UpdateType.Message });
                     ProgramHost.Run();
                 }
                 catch (HttpRequestException)
                 {
                     Log.Warning($"Caught an HTTP Request Exception, waiting {NetworkWait.TotalSeconds} seconds and trying again");
-                    OutputBot.StopReceiving();
                     await Task.Delay(NetworkWait);
                 }
 #if !DEBUG
@@ -123,10 +123,11 @@ namespace DiegoG.WebWatcher
 
         public static void LoadExtensions(params string[] names)
         {
-            Log.Information($"Attempting to load extension {names}");
+            var ext = string.Join(" ,", names);
+            Log.Information($"Attempting to load extensions: {ext}");
             var settings = Settings<WatcherSettings>.Current;
 
-            var allowednames = names.Where(s => !ExtensionLoader.LoadedExtensions.Any(d => d == s));
+            var allowednames = names.Where(s => ExtensionLoader.LoadedExtensions.All(d => d != s));
 
             foreach (var name in allowednames)
                 if (!settings.ExtensionsEnable.ContainsKey(Path.GetFileName(name)))
@@ -137,7 +138,10 @@ namespace DiegoG.WebWatcher
 
             Service.LoadWatchers();
             OutputBot.Processor.LoadNewCommands(AppDomain.CurrentDomain.GetAssemblies());
-            OutputBot.Client.SetMyCommandsAsync(OutputBot.Processor.CommandList.AvailableCommands).Wait();
+
+            Log.Information($"Succesfully loaded extensions: {ext}");
+
+            OutBot.EnqueueAction(b => b.SetMyCommandsAsync(OutBot.Processor.CommandList.AvailableCommands));
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
