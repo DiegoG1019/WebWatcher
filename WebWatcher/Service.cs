@@ -163,9 +163,6 @@ namespace DiegoG.WebWatcher
 
             DaemonStatistics = new() { StartTime = DateTime.Now };
 
-            Log.Information("Starting to receive messages");
-            OutputBot.StartReceiving(new[] { UpdateType.Message });
-
             Log.Information("Entering Main Loop");
             while (!token.IsCancellationRequested)
             {

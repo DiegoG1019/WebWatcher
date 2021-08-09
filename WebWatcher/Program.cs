@@ -40,7 +40,6 @@ namespace DiegoG.WebWatcher
             static async Task WaitAndTryAgain(Exception e)
             {
                 Log.Warning($"Caught: {e.GetType().Name}: {e.Message}\nwaiting {NetworkWait.TotalSeconds} seconds and trying again");
-                OutputBot.StopReceiving();
                 await Task.Delay(NetworkWait);
             }
             while (true)
@@ -65,16 +64,16 @@ namespace DiegoG.WebWatcher
                 .WriteTo.File(Directories.InLogs(".log"), rollingInterval: RollingInterval.Hour, restrictedToMinimumLevel: settings.FileLogEventLevel);
 
             if (settings.LogChatId is not 0)
-                logconf.WriteTo.TelegramBot(settings.LogChatId, OutputBot.Processor, settings.BotLogEventLevel, settings.VersionName);
+                logconf.WriteTo.TelegramBot(settings.LogChatId, OutputBot.Client, settings.BotLogEventLevel, settings.VersionName);
 
             Log.Logger = logconf.CreateLogger();
 
             LoadEnabledExtensions();
 
             Service.LoadWatchers();
-            OutputBot.Processor.LoadNewCommands(AppDomain.CurrentDomain.GetAssemblies());
+            OutputBot.Client.LoadNewCommands(AppDomain.CurrentDomain.GetAssemblies());
 
-            OutputBot.Processor.MessageQueue.ApiSaturationLimit = 20;
+            OutputBot.Client.MessageQueue.ApiSaturationLimit = 20;
 
             Settings<WatcherSettings>.SaveSettings();
 
@@ -137,7 +136,7 @@ namespace DiegoG.WebWatcher
             ExtensionLoader.Load(allowednames);
 
             Service.LoadWatchers();
-            OutputBot.Processor.LoadNewCommands(AppDomain.CurrentDomain.GetAssemblies());
+            OutputBot.Client.LoadNewCommands(AppDomain.CurrentDomain.GetAssemblies());
 
             Log.Information($"Succesfully loaded extensions: {ext}");
 
