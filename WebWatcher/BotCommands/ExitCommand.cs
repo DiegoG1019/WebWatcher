@@ -56,7 +56,7 @@ namespace DiegoG.WebWatcher.BotCommands
 
         public async Task<CommandResponse> Action(BotCommandArguments args)
         {
-            if (!OutputBot.GetAdmin(args.User.Id, out var adm) || adm.Rights < OutputBot.AdminRights.Admin)
+            if (!OutputBot.GetAdmin(args.User.Id, out var adm) || adm.Rights < AdminRights.Admin)
                 return new(args.Message, false, "You do not have permissions to perform this operation");
 
             Held.Add(args.User);

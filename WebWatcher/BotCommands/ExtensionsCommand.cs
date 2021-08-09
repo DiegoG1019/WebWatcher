@@ -44,7 +44,7 @@ namespace DiegoG.WebWatcher.BotCommands
 
         public async Task<CommandResponse> Action(BotCommandArguments args)
         => args.Arguments.Length == 1
-                ? OutputBot.GetAdmin(args.User.Id, out var admin) && admin.Rights >= OutputBot.AdminRights.Moderator
+                ? OutputBot.GetAdmin(args.User.Id, out var admin) && admin.Rights >= AdminRights.Moderator
                     ? new(args.Message, true, "What do you want to do? Hint: write 'help' or 'done'") //It's not necessary to hold user state, since enough state data is stored to bring them down one level, which is enough
                     : new(args.Message, false, "You do not have the rights to do that")
                 : new(args.Message, false, "Too many arguments. Please write /extensions");

@@ -69,20 +69,15 @@ namespace DiegoG.WebWatcher
             };
         }
 
+        internal static AdminRights GetAdmin(User user)
+            => AccessList.FirstOrDefault(u => u.User == user.Id)?.Rights ?? AdminRights.Disallow;
+
         internal static bool GetAdmin(long user, [NotNullWhen(true)]out AdminUser? admin)
         {
             admin = AccessList.FirstOrDefault(u => u.User == user);
             return admin is not null;
         }
 
-        internal enum AdminRights
-        {
-            Disallow,
-            User,
-            Moderator,
-            Admin,
-            Creator
-        }
         internal record AdminUser(
             int User,
             AdminRights Rights

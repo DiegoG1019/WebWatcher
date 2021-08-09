@@ -57,7 +57,7 @@ namespace DiegoG.WebWatcher.BotCommands
 
                     str += "\nTotal Commands Executed Per User:";
 
-                    var isMod = (admin?.Rights ?? 0) >= OutputBot.AdminRights.Moderator;
+                    var isMod = (admin?.Rights ?? 0) >= AdminRights.Moderator;
                     
                     foreach (var kv in s.TotalCommandsExecutedPerUser)
                     {

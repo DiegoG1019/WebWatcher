@@ -55,6 +55,7 @@ namespace DiegoG.WebWatcher
                     Log.Information("Initializing bot");
                     OutputBot.Initialize();
                     OutBot.Processor = OutputBot.Client;
+                    OutBot.GetIfAdmin_ = OutputBot.GetAdmin;
                     break;
                 }
                 catch(InvalidDataException)

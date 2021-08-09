@@ -20,7 +20,7 @@ namespace DiegoG.WebWatcher.BotCommands
         private static string GetAdminRights()
         {
             var s = "User Rights Available: ";
-            foreach (var n in Enum.GetValues(typeof(OutputBot.AdminRights)))
+            foreach (var n in Enum.GetValues(typeof(AdminRights)))
                 s += $"{(int)n} : {n}, ";
             return s[..^2];
         }
@@ -40,7 +40,7 @@ namespace DiegoG.WebWatcher.BotCommands
         public async Task<CommandResponse> Action(BotCommandArguments arguments)
         {
             var args = arguments.Arguments;
-            if (!OutputBot.GetAdmin(arguments.User.Id, out var u) || u.Rights != OutputBot.AdminRights.Creator)
+            if (!OutputBot.GetAdmin(arguments.User.Id, out var u) || u.Rights != AdminRights.Creator)
                 return new(arguments.Message, false, "You do not have the rights to perform this operation");
 
             if (args.Length < 3)
@@ -49,9 +49,9 @@ namespace DiegoG.WebWatcher.BotCommands
             if (!int.TryParse(args[1], out var userid))
                 return new(arguments.Message, false, "Invalid UserID");
 
-            if (Enum.TryParse<OutputBot.AdminRights>(args[2], out var r) && Enum.GetName(r) is not null)
+            if (Enum.TryParse<AdminRights>(args[2], out var r) && Enum.GetName(r) is not null)
             {
-                if (r is OutputBot.AdminRights.Disallow)
+                if (r is AdminRights.Disallow)
                     OutputBot.AccessList.RemoveAt(OutputBot.AccessList.FindIndex(s => s.User == userid));
                 else
                 {

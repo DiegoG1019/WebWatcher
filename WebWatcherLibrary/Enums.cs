@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace DiegoG.WebWatcher
 {
-    public static class WatcherData
+    public enum AdminRights
     {
-        public static Version LibraryVersion { get; } = new(1, 0, 12);
+        Disallow,
+        User,
+        Moderator,
+        Admin,
+        Creator
     }
 }
