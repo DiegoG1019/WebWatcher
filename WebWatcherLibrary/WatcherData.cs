@@ -8,6 +8,6 @@ namespace DiegoG.WebWatcher
 {
     public static class WatcherData
     {
-        public static Version LibraryVersion { get; } = new(1, 0, 7);
+        public static Version LibraryVersion { get; } = new(1, 0, 9);
     }
 }
