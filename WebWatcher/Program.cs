@@ -33,8 +33,14 @@ namespace DiegoG.WebWatcher
             Settings<WatcherSettings>.Initialize(Directories.Configuration, "settings.cfg", true, null, s => { });
 
             if (Settings<WatcherSettings>.Current.BotAPIKey is null)
-                throw new InvalidDataException("Settings file is invalid. Please fill out the BotAPIKey field");
+                throw new InvalidDataException($"Settings file is invalid. Please fill out the BotAPIKey field in {Directories.InConfiguration("settings.cfg.json")}");
 
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
+                .WriteTo.Console(Serilog.Events.LogEventLevel.Verbose)
+                .CreateLogger();
+            
             ExtensionLoader.Initialize(Directories.Extensions);
 
             static async Task WaitAndTryAgain(Exception e)
@@ -49,6 +55,10 @@ namespace DiegoG.WebWatcher
                     Log.Information("Initializing bot");
                     OutputBot.Initialize();
                     break;
+                }
+                catch(InvalidDataException)
+                {
+                    throw;
                 }
                 catch (Exception e)
                 {

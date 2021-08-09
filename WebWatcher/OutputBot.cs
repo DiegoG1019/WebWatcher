@@ -43,13 +43,15 @@ namespace DiegoG.WebWatcher
                 IsInit = true;
             }
 
-            AccessList = System.IO.File.Exists(Directories.InData("allow.json"))
-                ? (List<AdminUser>)Serialization.Deserialize.Json(Directories.Data, "allow", typeof(List<AdminUser>))
-                : throw new InvalidDataException($"Could not find file: {Directories.InData("allow.json")}. This file is necessary for the bot to function.");
+            if (System.IO.File.Exists(Directories.InData("allow.json")))
+                AccessList = (List<AdminUser>)Serialization.Deserialize.Json(Directories.Data, "allow", typeof(List<AdminUser>));
+            else
+            {
+                Serialization.Serialize.Json(new List<AdminUser>() { new(-1, AdminRights.Disallow) }, Directories.Data, "allow");
+                throw new InvalidDataException($"Could not find file: {Directories.InData("allow.json")}. This file is necessary for the bot to function.");
+            }
 
             Client = new(Settings<WatcherSettings>.Current.BotAPIKey!, 20, messageFilter: e => AccessList.Any(u => u.User == e.From.Id && u.Rights > AdminRights.Disallow));
-
-            Client.Timeout = TimeSpan.FromSeconds(30);
 
             Client.CommandCalled += (s,e) =>
             {
