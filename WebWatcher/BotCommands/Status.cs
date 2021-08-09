@@ -10,6 +10,7 @@ using DiegoG.Utilities.Collections;
 using DiegoG.Utilities.IO;
 using DiegoG.Utilities.Reflection;
 using Telegram.Bot.Types;
+using Humanizer;
 
 namespace DiegoG.WebWatcher.BotCommands
 {
@@ -20,33 +21,33 @@ namespace DiegoG.WebWatcher.BotCommands
 
         public string HelpUsage { get; } = "/status [option]";
 
-        public IEnumerable<(string Option, string Explanation)>? HelpOptions { get; } = new[]
+        public IEnumerable<OptionDescription>? HelpOptions { get; } = new OptionDescription[]
         {
-            ("/status stats","Provides Bot Service Statistics"),
-            ("/status admins","Provides a list of admins and their rights"),
-            ("/status watchers","Provides a list of Watchers")
+            new("/status stats","Provides Bot Service Statistics"),
+            new("/status admins","Provides a list of admins and their rights"),
+            new("/status watchers","Provides a list of Watchers")
         };
 
         public string Trigger => "/status";
 
         public string? Alias => null;
 
-        public BotCommandProcessor Processor { get; set; }
+        public TelegramBotCommandClient Processor { get; set; }
 
-        public Task<(string, bool)> Action(BotCommandArguments arguments)
+        public async Task<CommandResponse> Action(BotCommandArguments arguments)
         {
             var user = arguments.User;
             OutputBot.GetAdmin(user.Id, out var admin);
 
             var args = arguments.Arguments;
             if (args.Length > 2)
-                return Task.FromResult(("Too many arguments", false));
+                return new CommandResponse(arguments.Message, false, "Too many arguments");
 
             if(args.Length == 1)
-                return Task.FromResult(($"Alive and well. Running Time: {Program.RunningTime}\n\nRunning WebWatcher Version {Program.Version} under Library Version {WatcherData.LibraryVersion}", false));
+                return new CommandResponse(arguments.Message, false, $"Alive and well. Running Time: {Program.RunningTime.Humanize()}\n\nRunning WebWatcher Version {Program.Version} under Library Version {WatcherData.LibraryVersion}");
 
             if (args[1] == "stats")
-                return Task.Run(() =>
+                return await Task.Run(() =>
                 {
                     var s = Service.DaemonStatistics;
                     var str = "Statistics Report\n";
@@ -75,32 +76,32 @@ namespace DiegoG.WebWatcher.BotCommands
                     foreach (var kv in s.TotalWatchRuns)
                         str += $"\n\t{kv.Key}: {kv.Value}";
 
-                    return (str, false);
+                    return new CommandResponse(arguments.Message, false, str);
 
                 });
 
             if (args[1] == "admins")
-                return Task.Run(() =>
+                return await Task.Run(() =>
                 {
                     var s = "";
                     foreach (var a in OutputBot.AccessList)
                         s += $"{a.User} - {a.Rights}\n";
-                    return (s, false);
+                    return new CommandResponse(arguments.Message, false, s);
                 });
 
             if (args[1] == "watchers")
-                return Task.Run(() =>
+                return await Task.Run(() =>
                 {
                     var s = "Available Watchers:\n";
                     foreach (var w in Service.AvailableWatchers)
                         s += $"{w}\n";
-                    return (s, false);
+                    return new CommandResponse(arguments.Message, false, s);
                 });
 
-            return Task.FromResult(("Unknown option", false));
+            return new(arguments.Message, false, "Unknown option");
         }
 
-        public Task<(string Result, bool Hold)> ActionReply(BotCommandArguments args)
+        public Task<CommandResponse> ActionReply(BotCommandArguments args)
         {
             throw new NotImplementedException();
         }

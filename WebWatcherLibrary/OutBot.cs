@@ -12,8 +12,7 @@ namespace DiegoG.WebWatcher
 {
     public static class OutBot
     {
-        public static TelegramBotClient Client { get; internal set; }
-        public static BotCommandProcessor Processor { get; internal set; }
+        public static TelegramBotCommandClient Processor { get; internal set; }
         public static void EnqueueAction(MessageQueue.BotAction action) => Processor.MessageQueue.EnqueueAction(action);
         public static Task<TResult> EnqueueFunc<TResult>(MessageQueue.BotFunc<TResult> func) => Processor.MessageQueue.EnqueueFunc(func);
     }

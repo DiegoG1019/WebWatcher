@@ -25,31 +25,31 @@ namespace DiegoG.WebWatcher.BotCommands
             return s[..^2];
         }
 
-        public IEnumerable<(string Option, string Explanation)>? HelpOptions { get; } = new[]
+        public IEnumerable<OptionDescription>? HelpOptions { get; } = new OptionDescription[]
         {
-            ("userid","The numeric user id used to identify the user. You can use @raw_data_bot for this."),
-            ("rights",GetAdminRights()),
+            new("userid","The numeric user id used to identify the user. You can use @raw_data_bot for this."),
+            new("rights", GetAdminRights()),
         };
 
         public string Trigger { get; } = "/allow";
 
         public string? Alias => null;
 
-        public BotCommandProcessor Processor { get; set; }
+        public TelegramBotCommandClient Processor { get; set; }
 
-        public Task<(string, bool)> Action(BotCommandArguments arguments)
+        public async Task<CommandResponse> Action(BotCommandArguments arguments)
         {
             var args = arguments.Arguments;
             if (!OutputBot.GetAdmin(arguments.User.Id, out var u) || u.Rights != OutputBot.AdminRights.Creator)
-                return Task.FromResult(("You do not have the rights to perform this operation", false));
+                return new(arguments.Message, false, "You do not have the rights to perform this operation");
 
             if (args.Length < 3)
-                return Task.FromResult(("Not enough arguments for the operation", false));
-
+                return new(arguments.Message, false, "Not enough arguments for the operation");
+            
             if (!int.TryParse(args[1], out var userid))
-                return Task.FromResult(("Invalid UserID", false));
+                return new(arguments.Message, false, "Invalid UserID");
 
-            if(Enum.TryParse<OutputBot.AdminRights>(args[2], out var r) && Enum.GetName(r) is not null)
+            if (Enum.TryParse<OutputBot.AdminRights>(args[2], out var r) && Enum.GetName(r) is not null)
             {
                 if (r is OutputBot.AdminRights.Disallow)
                     OutputBot.AccessList.RemoveAt(OutputBot.AccessList.FindIndex(s => s.User == userid));
@@ -63,13 +63,13 @@ namespace DiegoG.WebWatcher.BotCommands
                 }
                 
                 OutputBot.CommitAccessListToDisk();
-                return Task.FromResult(("Succesfully updated the AccessList", false));
+                return new(arguments.Message, false, "Succesfully updated the AccessList");
             }
 
-            return Task.FromResult(("Invalid Admin Right", false));
+            return new(arguments.Message, false, "Invalid Admin Right");
         }
 
-        public Task<(string Result, bool Hold)> ActionReply(BotCommandArguments args)
+        public Task<CommandResponse> ActionReply(BotCommandArguments args)
         {
             throw new NotImplementedException();
         }

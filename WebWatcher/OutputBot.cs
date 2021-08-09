@@ -22,8 +22,7 @@ namespace DiegoG.WebWatcher
     {
         //These are all assigned in Initialize. It's not a static constructor because I need to be able to control when its called
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public static TelegramBotClient Client { get; private set; }
-        public static BotCommandProcessor Processor { get; private set; }
+        public static TelegramBotCommandClient Client { get; private set; }
 
         internal static List<AdminUser> AccessList { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -48,13 +47,11 @@ namespace DiegoG.WebWatcher
                 ? (List<AdminUser>)Serialization.Deserialize.Json(Directories.Data, "allow", typeof(List<AdminUser>))
                 : throw new InvalidDataException($"Could not find file: {Directories.InData("allow.json")}. This file is necessary for the bot to function.");
 
-            Client = new(Settings<WatcherSettings>.Current.BotAPIKey);
+            Client = new(Settings<WatcherSettings>.Current.BotAPIKey!, 20, messageFilter: e => AccessList.Any(u => u.User == e.From.Id && u.Rights > AdminRights.Disallow));
 
             Client.Timeout = TimeSpan.FromSeconds(30);
 
-            Processor = new(Client, TelegramBot.Types.BotKey.Any, null, e => AccessList.Any(u => u.User == e.From.Id && u.Rights > AdminRights.Disallow));
-
-            Processor.CommandCalled += (s,e) =>
+            Client.CommandCalled += (s,e) =>
             {
                 var c = e.Arguments[0];
                 var u = e.User.Id;
@@ -68,20 +65,6 @@ namespace DiegoG.WebWatcher
 
                 dir[c][u]++;
             };
-
-            OutBot.Client = Client;
-            OutBot.Processor = Processor;
-        }
-
-        public static void StartReceiving(UpdateType[] updateTypes)
-        {
-            if(Client is not null && !Client.IsReceiving)
-                Client.StartReceiving(updateTypes);
-        }
-        public static void StopReceiving()
-        {
-            if(Client is not null && Client.IsReceiving)
-                Client.StopReceiving();
         }
 
         internal static bool GetAdmin(long user, [NotNullWhen(true)]out AdminUser? admin)

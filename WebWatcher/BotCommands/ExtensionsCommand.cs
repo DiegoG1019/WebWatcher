@@ -23,47 +23,47 @@ namespace DiegoG.WebWatcher.BotCommands
 
         public string HelpUsage => "/extensions";
 
-        public IEnumerable<(string Option, string Explanation)>? HelpOptions { get; } = new[]
+        public IEnumerable<OptionDescription>? HelpOptions { get; } = new OptionDescription[]
         {
-            ("help","When used as a reply to an /extensions call, provides this message"),
-            ("list loaded","Lists all loaded extensions available"),
-            ("list unloaded","Lists all unloaded extensions available"),
-            ("list enabled","Lists all enabled extensions"),
-            ("list disabled", "Lists all disabled extensions"),
-            ("load [file]", "Loads the specified file; write 'all' to load all unlodaded extensions available"),
-            ("done","Allows you to issue other commands"),
-            ("enable", "Enables the specified extensions, but does not load them"),
-            ("disable", "Disables the specified extensions, requires a restart")
+            new("help","When used as a reply to an /extensions call, provides this message"),
+            new("list loaded","Lists all loaded extensions available"),
+            new("list unloaded","Lists all unloaded extensions available"),
+            new("list enabled","Lists all enabled extensions"),
+            new("list disabled", "Lists all disabled extensions"),
+            new("load [file]", "Loads the specified file; write 'all' to load all unlodaded extensions available"),
+            new("done","Allows you to issue other commands"),
+            new("enable", "Enables the specified extensions, but does not load them"),
+            new("disable", "Disables the specified extensions, requires a restart")
         };
 
         public string Trigger => "/extensions";
 
         public string? Alias => "/ext";
 
-        public BotCommandProcessor Processor { get; set; }
+        public TelegramBotCommandClient Processor { get; set; }
 
-        public Task<(string Result, bool Hold)> Action(BotCommandArguments args)
+        public async Task<CommandResponse> Action(BotCommandArguments args)
         => args.Arguments.Length == 1
                 ? OutputBot.GetAdmin(args.User.Id, out var admin) && admin.Rights >= OutputBot.AdminRights.Moderator
-                    ? Task.FromResult(("What do you want to do? Hint: write 'help' or 'done'", true)) //It's not necessary to hold user state, since enough state data is stored to bring them down one level, which is enough
-                    : Task.FromResult(("You do not have the rights to do that", false))
-                : Task.FromResult(("Too many arguments. Please write /extensions", false));
+                    ? new(args.Message, true, "What do you want to do? Hint: write 'help' or 'done'") //It's not necessary to hold user state, since enough state data is stored to bring them down one level, which is enough
+                    : new(args.Message, false, "You do not have the rights to do that")
+                : new(args.Message, false, "Too many arguments. Please write /extensions");
 
-        public Task<(string Result, bool Hold)> ActionReply(BotCommandArguments args)
+        public async Task<CommandResponse> ActionReply(BotCommandArguments args)
         {
             var arg = args.Arguments[0].ToLower();
-            if (arg == "done")
-                return Task.FromResult(("Finished.", false));
 
-            return Task.FromResult((arg switch
-            {
-                "help" => Help(),
-                "list" => List(),
-                "load" => Load(),
-                "enable" => Enable(),
-                "disable" => Disable(),
-                _ => "Unknown action"
-            }, true));
+            return arg == "done"
+                ? (new(args.Message, false, "Finished."))
+                : (new(args.Message, true, arg switch
+                                                    {
+                                                        "help" => Help(),
+                                                        "list" => List(),
+                                                        "load" => Load(),
+                                                        "enable" => Enable(),
+                                                        "disable" => Disable(),
+                                                        _ => "Unknown action"
+                                                    }));
 
             string Help()
             {

@@ -16,33 +16,33 @@ namespace DiegoG.WebWatcher.BotCommands
 
         public string HelpUsage => "/forcecheck (WatcherName)";
 
-        public IEnumerable<(string Option, string Explanation)>? HelpOptions => null;
+        public IEnumerable<OptionDescription>? HelpOptions => null;
 
         public string Trigger => "/forcecheck";
 
         public string? Alias => null;
 
-        public BotCommandProcessor Processor { get; set; }
+        public TelegramBotCommandClient Processor { get; set; }
 
-        public Task<(string Result, bool Hold)> Action(BotCommandArguments args)
+        public Task<CommandResponse> Action(BotCommandArguments args)
         {
             if (args.Arguments.Length < 2)
-                return Task.FromResult(("Too few arguments.", false));
+                return Task.FromResult(new CommandResponse(args.Message, false, "Too few arguments."));
             if (args.Arguments.Length > 2)
-                return Task.FromResult(("Too many arguments.", false));
+                return Task.FromResult(new CommandResponse(args.Message, false, "Too many arguments."));
 
             try
             {
                 Service.ForceCheck(args.Arguments[1]);
-                return Task.FromResult(($"Succesfully forced routine {args.Arguments[1]} to run", false));
+                return Task.FromResult(new CommandResponse(args.Message, false, $"Succesfully forced routine {args.Arguments[1]} to run"));
             }
             catch (ArgumentException e)
             {
-                return Task.FromResult((e.Message, false));
+                return Task.FromResult(new CommandResponse(args.Message, false, e.Message));
             }
         }
 
-        public Task<(string Result, bool Hold)> ActionReply(BotCommandArguments args)
+        public Task<CommandResponse> ActionReply(BotCommandArguments args)
         {
             throw new NotImplementedException();
         }

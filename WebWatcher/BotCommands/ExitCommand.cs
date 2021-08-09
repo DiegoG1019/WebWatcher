@@ -17,13 +17,13 @@ namespace DiegoG.WebWatcher.BotCommands
 
         public string HelpUsage { get; } = "/exit";
 
-        public IEnumerable<(string Option, string Explanation)>? HelpOptions => null;
+        public IEnumerable<OptionDescription>? HelpOptions => null;
 
         public string Trigger => "/exit";
 
         public string? Alias => null;
 
-        public BotCommandProcessor Processor { get; set; }
+        public TelegramBotCommandClient Processor { get; set; }
 
         private List<User> Held { get; } = new();
         public IEnumerable<User>? Hold => Held;
@@ -34,38 +34,38 @@ namespace DiegoG.WebWatcher.BotCommands
                 Held.Remove(user);
         }
 
-        public Task<(string, bool)> ActionReply(BotCommandArguments args)
+        public async Task<CommandResponse> ActionReply(BotCommandArguments args)
         {
             if (Held.Contains(args.User))
             {
                 if (args.Arguments[0] == "yes")
                 {
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
-						await Task.WhenAll(new[]{ Settings<WatcherSettings>.SaveSettingsAsync(), Task.Delay(500) });
+						await Task.WhenAll(new[]{ Settings<WatcherSettings>.SaveSettingsAsync(), Task.Delay(1000) });
                         Environment.Exit(0);
                     });
                     Cancel(args.User);
-                    return Task.FromResult(("Bot shutting down in 500ms", false));
+                    return new(args.Message, false, "Bot shutting down in 1000ms");
                 }
                 Cancel(args.User);
-                return Task.FromResult(("Cancelling Exit order", false));
+                return new(args.Message, false, "Cancelling Exit order");
             }
-            return Task.FromResult(("Exit order automatically canceled", false));
+            return new(args.Message, false, "Exit order automatically canceled");
         }
 
-        public Task<(string, bool)> Action(BotCommandArguments args)
+        public async Task<CommandResponse> Action(BotCommandArguments args)
         {
             if (!OutputBot.GetAdmin(args.User.Id, out var adm) || adm.Rights < OutputBot.AdminRights.Admin)
-                return Task.FromResult(("You do not have permissions to perform this operation", false));
+                return new(args.Message, false, "You do not have permissions to perform this operation");
 
             Held.Add(args.User);
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 await Task.Delay(TimeSpan.FromMinutes(1));
                 Cancel(args.User);
             });
-            return Task.FromResult(("Are you sure you want the bot to exit? Please write 'yes' if so.", true));
+            return new(args.Message, true, "Are you sure you want the bot to exit? Please write 'yes' if so.");
         }
     }
 }
