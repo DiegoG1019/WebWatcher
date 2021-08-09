@@ -11,12 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DiegoG.TelegramBot" Version="1.5.0" />
+    <PackageReference Include="DiegoG.TelegramBot" Version="1.7.3" />
     <PackageReference Include="DiegoG.Utilities.Basic" Version="1.0.2" />
     <PackageReference Include="DiegoG.Utilities.Collections" Version="1.0.0" />
     <PackageReference Include="DiegoG.Utilities.Reflection" Version="1.1.2" />
     <PackageReference Include="DiegoG.Utilities.Serialization" Version="1.0.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
+    <PackageReference Include="Humanizer.Core" Version="2.11.10" />
   </ItemGroup>
 
 </Project>
