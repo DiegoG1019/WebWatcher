@@ -77,6 +77,7 @@ namespace DiegoG.WebWatcher
         private static readonly List<string> WatcherNameList = new();
         private static readonly ConcurrentQueue<Func<Task>> ActionQueue = new();
         private static readonly List<WatcherTimerPair> Watchers = new();
+        private static readonly ConcurrentDictionary<int, string> TaskDict = new();
         public static void AddWatcher(Type watcherType)
         {
             IWebWatcher watcher;
@@ -113,12 +114,19 @@ namespace DiegoG.WebWatcher
                     if (!DaemonStatistics.TotalWatchRuns.ContainsKey(pair.Name))
                         DaemonStatistics.TotalWatchRuns.Add(pair.Name, 0);
                     DaemonStatistics.TotalWatchRuns[pair.Name]++;
-                    return pair.Watcher.Check();
+                    var t = pair.Watcher.Check();
+                    TaskDict[t.Id] = pair.Name;
+                    return t;
                 }));
 
             Watchers.Add(pair);
             WatcherNameList.Add(pair.Name);
-            ActionQueue.Enqueue(pair.Watcher.FirstCheck);
+            ActionQueue.Enqueue(() => 
+            {
+                var t = pair.Watcher.FirstCheck();
+                TaskDict[t.Id] = pair.Name;
+                return t;
+            });
             pair.Timer.Start();
         }
 
@@ -176,7 +184,13 @@ namespace DiegoG.WebWatcher
                 DaemonStatistics.TotalTasksAwaited += (ulong)tasks.Count;
                 DaemonStatistics.AverageTasksPerLoop.AddSample(tasks.Count);
 
-                await tasks;
+
+                foreach (var t in tasks)
+                    await t.AwaitWithTimeout(5000, ifError: () =>
+                    {
+                        TaskDict.TryGetValue(t.Id, out var v);
+                        Log.Error($"Task #{t.Id} took too long to complete. Task #{t.Id} belongs to {v ?? "Unknown"}");
+                    });
                 tasks.Clear();
 
                 if (throttletask.IsCompleted)
