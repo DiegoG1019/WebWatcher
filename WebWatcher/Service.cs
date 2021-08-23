@@ -25,12 +25,13 @@ namespace DiegoG.WebWatcher
         /// </summary>
         public static uint MaxTasks { get; set; } = 5;
 
-        private class WatcherTimerPair
+        public class WatcherTimerPair
         {
             public readonly IWebWatcher Watcher;
             public readonly Task Timer;
             public readonly string Name;
             public readonly Action<WatcherTimerPair> Action;
+            public bool Pause { get; set; }
 
             private bool Cancel = false;
 
@@ -57,7 +58,8 @@ namespace DiegoG.WebWatcher
                         while (!Cancel)
                         {
                             await Task.Delay(watcher.Interval);
-                            Action(this);
+                            if (!Pause)
+                                Action(this);
                         }
                     }, 
                     CancellationToken.None, 
@@ -73,6 +75,7 @@ namespace DiegoG.WebWatcher
         }
 
         public static IEnumerable<string> AvailableWatchers => WatcherNameList;
+        public static IEnumerable<WatcherTimerPair> AvailableWatcherPairs => Watchers;
 
         private static readonly List<string> WatcherNameList = new();
         private static readonly ConcurrentQueue<Func<Task>> ActionQueue = new();
