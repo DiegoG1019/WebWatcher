@@ -26,6 +26,7 @@ namespace DiegoG.WebWatcher
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private readonly static Stopwatch RunningTimeWatch = new();
         private readonly static TimeSpan NetworkWait = TimeSpan.FromMinutes(.5);
+
         public static async Task Main(string[] args)
         {
             RunningTimeWatch.Start();
@@ -34,7 +35,6 @@ namespace DiegoG.WebWatcher
 
             if (Settings<WatcherSettings>.Current.BotAPIKey is null)
                 throw new InvalidDataException($"Settings file is invalid. Please fill out the BotAPIKey field in {Directories.InConfiguration("settings.cfg.json")}");
-
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
@@ -89,18 +89,29 @@ namespace DiegoG.WebWatcher
 
             Settings<WatcherSettings>.SaveSettings();
 
-            ProgramHost = CreateHostBuilder(args).Build();
+            {
+                var builder = CreateHostBuilder(args);
+                builder.UseSerilog();
+                ProgramHost = builder.Build();
+            }
 
             while (true)
             {
                 try
                 {
                     ProgramHost.Run();
+                    Log.Information("Application succesfully shut down");
+                    return;
                 }
                 catch (HttpRequestException)
                 {
                     Log.Warning($"Caught an HTTP Request Exception, waiting {NetworkWait.TotalSeconds} seconds and trying again");
                     await Task.Delay(NetworkWait);
+                }
+                catch (OperationCanceledException)
+                {
+                    Log.Information("Application shut down");
+                    return;
                 }
 #if !DEBUG
                 catch(Exception e)

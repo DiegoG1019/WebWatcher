@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <UserSecretsId>dotnet-WebWatcher-B0A554A2-0A8D-412F-9EDA-3FFCEA999A55</UserSecretsId>
     <AssemblyName>DiegoG.WebWatcher</AssemblyName>
     <RootNamespace>DiegoG.WebWatcher</RootNamespace>
@@ -9,10 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="7.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="Serilog.Sinks.SyslogMessages" Version="2.0.5" />
+    <PackageReference Include="Serilog.Sinks.SyslogMessages" Version="3.0.1" />
   </ItemGroup>
 
   <ItemGroup>
