@@ -49,53 +49,58 @@ namespace DiegoG.WebWatcher.BotCommands
             if (args[1] == "stats")
                 return await Task.Run(() =>
                 {
-                    var s = Service.DaemonStatistics;
-                    var str = "Statistics Report\n";
-                    foreach(var (p,v) in ReflectionCollectionMethods<Service.StatisticsReport>.GetAllInstancePropertyNameValueTuple(s))
-                        if(v is not IDictionary)
-                            str += $"{p ?? "Unknown Property"} : {v}\n";
+                    var s = WatcherService.Statistics;
 
-                    str += "\nTotal Commands Executed Per User:";
+                    var str = Program.GetSharedStringBuilder().AppendLine("Statistics Report");
+                    foreach(var (p,v) in ReflectionCollectionMethods<ServiceStatistics>.GetAllInstancePropertyNameValueTuple(s))
+                        if(v is not IDictionary)
+                            str.Append($"{p ?? "Unknown Property"} : {v}\n");
+
+                    str.Append("\nTotal Commands Executed Per User:");
 
                     var isMod = (admin?.Rights ?? 0) >= AdminRights.Moderator;
                     
-                    foreach (var kv in s.TotalCommandsExecutedPerUser)
+                    foreach (var kv in GlobalStatistics.TotalCommandsExecutedPerUser)
                     {
-                        str += $"\nCommand: {kv.Key}";
+                        str.Append($"\nCommand: {kv.Key}");
                         if (isMod)
                             foreach (var v in kv.Value)
-                                str += $"\n\tUser {v.Key}: {v.Value}";
+                                str.Append($"\n\tUser {v.Key}: {v.Value}");
                         else
                         {
                             kv.Value.TryGetValue(user.Id, out var val);
-                            str += $"\n\tUser {user.Id}: {val}";
+                            str.Append($"\n\tUser {user.Id}: {val}");
                         }    
                     }
 
-                    str += $"\n\nTotal Watch Routine Runs:";
-                    foreach (var kv in s.TotalWatchRuns)
-                        str += $"\n\t{kv.Key}: {kv.Value}";
+                    str.Append($"\n\nTotal Watch Routine Runs:");
+                    foreach (var kv in s.TotalRuns)
+                        str.Append($"\n\t{kv.Key}: {kv.Value}");
 
-                    return new CommandResponse(arguments.Message, false, str);
+                    str.Append($"\n\nTotal Subscription Report Runs:");
+                    foreach (var kv in s.TotalRuns)
+                        str.Append($"\n\t{kv.Key}: {kv.Value}");
+
+                    return new CommandResponse(arguments.Message, false, str.ToString());
 
                 });
 
             if (args[1] == "admins")
                 return await Task.Run(() =>
                 {
-                    var s = "";
+                    var s = Program.GetSharedStringBuilder();
                     foreach (var a in OutputBot.AccessList)
-                        s += $"{a.User} - {a.Rights}\n";
-                    return new CommandResponse(arguments.Message, false, s);
+                        s.Append($"{a.User} - {a.Rights}\n");
+                    return new CommandResponse(arguments.Message, false, s.ToString());
                 });
 
             if (args[1] == "watchers")
                 return await Task.Run(() =>
                 {
-                    var s = "Available Watchers:\n";
-                    foreach (var w in Service.AvailableWatchers)
-                        s += $"{w}\n";
-                    return new CommandResponse(arguments.Message, false, s);
+                    var s = Program.GetSharedStringBuilder().Append("Available Watchers:\n");
+                    foreach (var w in WatcherService.AvailableWatchers)
+                        s.Append($"{w}\n");
+                    return new CommandResponse(arguments.Message, false, s.ToString());
                 });
 
             return new(arguments.Message, false, "Unknown option");

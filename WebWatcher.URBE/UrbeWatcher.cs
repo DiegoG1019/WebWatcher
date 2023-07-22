@@ -9,7 +9,7 @@ public class UrbeWatcher : IWebWatcher
     public const string UrbeUri = "https://inscripciones.urbe.edu/InscripcionWeb/";
     public static bool IsActive { get; private set; }
 
-    public string Name { get; } = "URBE Watcher";
+    public string Name { get; } = "urbe_watcher";
     public TimeSpan Interval { get; } = TimeSpan.FromSeconds(30);
 
     private readonly HttpClient Http = new();

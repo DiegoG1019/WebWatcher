@@ -33,7 +33,7 @@ namespace DiegoG.WebWatcher.BotCommands
 
             try
             {
-                Service.ForceCheck(args.Arguments[1]);
+                WatcherService.ForceCheck(args.Arguments[1]);
                 return Task.FromResult(new CommandResponse(args.Message, false, $"Succesfully forced routine {args.Arguments[1]} to run"));
             }
             catch (ArgumentException e)

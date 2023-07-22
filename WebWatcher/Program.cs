@@ -13,6 +13,8 @@ using Telegram.Bot.Types.Enums;
 using System.Net.Http;
 using DiegoG.Utilities.Reflection;
 using Telegram.Bot.Exceptions;
+using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace DiegoG.WebWatcher
 {
@@ -39,6 +41,7 @@ namespace DiegoG.WebWatcher
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.Console(Serilog.Events.LogEventLevel.Verbose)
+                .WriteTo.LocalSyslog("DiegoG.WebWatcher")
                 .CreateLogger();
             
             ExtensionLoader.Initialize(Directories.Extensions);
@@ -75,14 +78,15 @@ namespace DiegoG.WebWatcher
                 .WriteTo.Console(settings.ConsoleLogEventLevel)
                 .WriteTo.File(Directories.InLogs(".log"), rollingInterval: RollingInterval.Hour, restrictedToMinimumLevel: settings.FileLogEventLevel);
 
-            if (settings.LogChatId is not 0)
-                logconf.WriteTo.TelegramBot(settings.LogChatId, OutputBot.Client, settings.BotLogEventLevel, settings.VersionName);
+            //if (settings.LogChatId is not 0)
+            //    logconf.WriteTo.TelegramBot(settings.LogChatId, OutputBot.Client, settings.BotLogEventLevel, settings.VersionName);
 
             Log.Logger = logconf.CreateLogger();
 
             LoadEnabledExtensions();
 
-            Service.LoadWatchers();
+            WatcherService.LoadWatchers();
+            SubscriptionService.LoadSubscriptions();
             OutputBot.Client.LoadNewCommands(AppDomain.CurrentDomain.GetAssemblies());
 
             OutputBot.Client.MessageQueue.ApiSaturationLimit = 20;
@@ -95,6 +99,10 @@ namespace DiegoG.WebWatcher
                 ProgramHost = builder.Build();
             }
 
+            {
+                var setts = Settings<WatcherSettings>.Current;
+                Log.Information($"Started Running WebWatcher v.{Program.Version} {(setts.VersionName is not null ? $"- {setts.VersionName}" : "")}");
+            }
             while (true)
             {
                 try
@@ -143,6 +151,10 @@ namespace DiegoG.WebWatcher
             }));
         }
 
+        [ThreadStatic]
+        private static StringBuilder? StringBuilder;
+        public static StringBuilder GetSharedStringBuilder() => (StringBuilder ??= new()).Clear();
+
         public static void LoadExtensions(params string[] names)
         {
             var ext = string.Join(" ,", names);
@@ -158,7 +170,8 @@ namespace DiegoG.WebWatcher
             allowednames = allowednames.Where(s => settings.ExtensionsEnable[Path.GetFileName(s)]);
             ExtensionLoader.Load(allowednames);
 
-            Service.LoadWatchers();
+            WatcherService.LoadWatchers();
+            SubscriptionService.LoadSubscriptions();
             OutputBot.Client.LoadNewCommands(AppDomain.CurrentDomain.GetAssemblies());
 
             Log.Information($"Succesfully loaded extensions: {ext}");

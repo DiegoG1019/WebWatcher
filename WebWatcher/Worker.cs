@@ -11,6 +11,9 @@ namespace DiegoG.WebWatcher
     public class Worker : BackgroundService
     {
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
-            => Service.Active(stoppingToken);
+            => Task.WhenAll(
+                Task.Run(async () => await WatcherService.Active(stoppingToken), stoppingToken), 
+                Task.Run(async () => await SubscriptionService.Active(stoppingToken), stoppingToken)
+            );
     }
 }

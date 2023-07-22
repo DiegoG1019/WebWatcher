@@ -46,30 +46,15 @@ public class RestartCommand : IBotCommand
                 _ = Task.Run(async () =>
                 {
                     await Task.WhenAll(new[] { Settings<WatcherSettings>.SaveSettingsAsync(), Task.Delay(1000) });
-                    var proc = Process.GetCurrentProcess();
-                    var startinfo = new ProcessStartInfo();
 
-                    foreach (var arg in Environment.GetCommandLineArgs())
-                        startinfo.ArgumentList.Add(arg);
-
-                    var launch = Environment.GetCommandLineArgs()[0];
-                    string exe;
-
-                    if (launch.EndsWith(".dll"))
-                    {
-                        var potential_exe = launch.Replace(".dll", ".exe");
-                        exe = File.Exists(potential_exe)
-                            ? potential_exe
-                            : throw new InvalidOperationException("Couldn't find an executable file to launch the app");
-                    }
+                    if (Settings<WatcherSettings>.Current.RestartCommand is string cmd)
+                        Process.Start(new ProcessStartInfo(cmd)
+                        {
+                            Arguments = Settings<WatcherSettings>.Current.RestartCommandArguments,
+                            UseShellExecute = true
+                        });
                     else
-                        exe = launch;
-
-                    Process.Start(new ProcessStartInfo(exe, Environment.CommandLine.Replace(launch, ""))
-                    {
-                        WorkingDirectory = Directory.GetCurrentDirectory()
-                    });
-                    Environment.Exit(0);
+                        throw new InvalidOperationException("The RestartCommand was lost somehow. The RestartCommand property of settings should not be modified after startup");
                 });
                 Cancel(args.User);
                 return new(args.Message, false, "Bot restarting down in 1000ms");
@@ -83,7 +68,10 @@ public class RestartCommand : IBotCommand
     public async Task<CommandResponse> Action(BotCommandArguments args)
     {
         if (!OutputBot.GetAdmin(args.User.Id, out var adm) || adm.Rights < AdminRights.Admin)
-            return new(args.Message, false, "You do not have permissions to perform this operation");
+            return new(args, false, "You do not have permissions to perform this operation");
+
+        if (Settings<WatcherSettings>.Current.RestartCommand is not string cmd)
+            return new(args, false, "This instance of WebWatcher was not configured with a RestartCommand. Check the Settings file and restart manually to configure it.");
 
         Held.Add(args.User);
         _ = Task.Run(async () =>

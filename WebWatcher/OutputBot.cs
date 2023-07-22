@@ -57,7 +57,7 @@ namespace DiegoG.WebWatcher
             {
                 var c = e.Arguments[0];
                 var u = e.User.Id;
-                var dir = Service.DaemonStatistics.TotalCommandsExecutedPerUser;
+                var dir = GlobalStatistics.TotalCommandsExecutedPerUser;
 
                 if (!dir.ContainsKey(c))
                     dir.Add(c, new());
