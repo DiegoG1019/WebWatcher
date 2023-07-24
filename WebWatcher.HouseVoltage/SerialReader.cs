@@ -58,7 +58,74 @@ public class SerialReader
         DataBlink.SetPinMode(PinMode.Input);
     }
 
-    public Task<Status> ReadNext(byte[] buffer, CancellationToken ct = default)
+    public Status ReadNext(Span<byte> buffer, CancellationToken ct = default)
+    {
+        Semaphore.Wait(ct);
+        try
+        {
+            bool blink = false;
+            int bitIndex = 0;
+
+            SignalMainReading.Write(PinValue.High);
+            for (int i = 0; i < 60; i++)
+            {
+                if (SignalAgentWriting.Read() == PinValue.High)
+                    goto AgentWriting;
+                Thread.Sleep(1);
+            }
+            return Status.AgentSignalTimedOut;
+
+            AgentWriting:
+            ct.ThrowIfCancellationRequested();
+            while (SignalAgentWriting.Read() == PinValue.High)
+            {
+                Clock.Write(PinValue.High);
+                for (int i = 0; i < 20; i++)
+                {
+                    if (SignalAgentWriting.Read() == PinValue.Low)
+                        return Status.PrematureEnd;
+
+                    var bl = DataBlink.Read() == PinValue.High;
+                    if (bl != blink)
+                    {
+                        blink = bl;
+                        goto DataInbound;
+                    }
+                    Thread.Sleep(1);
+                }
+                return SignalAgentWriting.Read() == PinValue.High ? Status.DataBlinkTimedOut : Status.PrematureEnd;
+
+                DataInbound:
+                ct.ThrowIfCancellationRequested();
+                buffer[bitIndex / 8] |= (byte)(((int)Data.Read()) << (bitIndex % 8));
+
+                bitIndex++;
+                Clock.Write(PinValue.Low);
+
+                if (bitIndex >= (8 * buffer.Length))
+                    return Status.ArrayTooSmall;
+            }
+
+            if (bitIndex != (8 * buffer.Length))
+                return bitIndex % 8 == 0 ? Status.ArrayNotFilled : Status.LatestByteNotFilled;
+        }
+        finally
+        {
+            try
+            {
+                SignalMainReading.Write(PinValue.Low);
+                Clock.Write(PinValue.Low);
+            }
+            finally
+            {
+                Semaphore.Release(); // The semaphore must be released after the pins are all set up, but it always, ALWAYS, must be released
+            }
+        }
+
+        return Status.Success;
+    }
+
+    public Task<Status> ReadNextAsync(byte[] buffer, CancellationToken ct = default)
         => Task.Run(async () =>
         {
             await Semaphore.WaitAsync(ct);

@@ -10,63 +10,65 @@ using DiegoG.WebWatcher;
 
 namespace WebWatcher.HouseVoltage;
 
-[Watcher]
-public class VoltageWatcher : IWebWatcher
-{
-    public string Name => "VoltageWatcher";
-    public TimeSpan Interval => TimeSpan.FromSeconds(1);
+// // This watcher was commented out because its duties were deferred to VoltageTracker, since it needs to be fired much more frequently
 
-    private static readonly string ConfigFile;
-    private static DateTime ConfigFileLastUpdate;
+//[Watcher]
+//public class VoltageWatcher : IWebWatcher
+//{
+//    public string Name => "VoltageWatcher";
+//    public TimeSpan Interval => TimeSpan.FromSeconds(1);
 
-    private static SerialReader Reader;
-    private static readonly byte[] ReaderBuffer = new byte[4];
+//    private static readonly string ConfigFile;
+//    private static DateTime ConfigFileLastUpdate;
 
-    public async Task Check()
-    {
-        if (ConfigFileLastUpdate != File.GetLastWriteTime(ConfigFile))
-            UpdateLastFile();
+//    private static SerialReader Reader;
+//    private static readonly byte[] ReaderBuffer = new byte[4];
 
-        Array.Clear(ReaderBuffer);
-        await Reader.ReadNext(ReaderBuffer);
-        VoltageReport.AddReport(VoltageReading.ReadBytes(ReaderBuffer));
-    }
+//    public async Task Check()
+//    {
+//        if (ConfigFileLastUpdate != File.GetLastWriteTime(ConfigFile))
+//            UpdateLastFile();
 
-    public Task FirstCheck()
-        => Task.CompletedTask;
+//        Array.Clear(ReaderBuffer);
+//        await Reader.ReadNext(ReaderBuffer);
+//        VoltageReport.AddReport(VoltageReading.ReadBytes(ReaderBuffer));
+//    }
 
-    private static void UpdateLastFile()
-    {
-        Span<SerialReader.PinConfiguration> pinSpan = stackalloc SerialReader.PinConfiguration[1];
-        using var fstream = File.OpenRead(ConfigFile);
-        fstream.Read(MemoryMarshal.AsBytes(pinSpan));
-        Reader = new(pinSpan[0]);
-        ConfigFileLastUpdate = File.GetLastWriteTime(ConfigFile);
-    }
+//    public Task FirstCheck()
+//        => Task.CompletedTask;
 
-    static VoltageWatcher()
-    {
-        Span<SerialReader.PinConfiguration> pinSpan = stackalloc SerialReader.PinConfiguration[1];
-        ref SerialReader.PinConfiguration pin = ref pinSpan[0];
+//    private static void UpdateLastFile()
+//    {
+//        Span<SerialReader.PinConfiguration> pinSpan = stackalloc SerialReader.PinConfiguration[1];
+//        using var fstream = File.OpenRead(ConfigFile);
+//        fstream.Read(MemoryMarshal.AsBytes(pinSpan));
+//        Reader = new(pinSpan[0]);
+//        ConfigFileLastUpdate = File.GetLastWriteTime(ConfigFile);
+//    }
 
-        var datdir = Directories.InConfiguration(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DiegoG.WebWatcher");
-        var datfile = Path.Combine(datdir, "voltagewatcher.cfg");
+//    static VoltageWatcher()
+//    {
+//        Span<SerialReader.PinConfiguration> pinSpan = stackalloc SerialReader.PinConfiguration[1];
+//        ref SerialReader.PinConfiguration pin = ref pinSpan[0];
 
-        Directory.CreateDirectory(datdir);
-        if (File.Exists(datfile) is false)
-        {
-            using var fstream = File.Open(datfile, FileMode.Create);
-            pin = new SerialReader.PinConfiguration(11, 29, 31, 13, 15);
-            fstream.Write(MemoryMarshal.AsBytes(pinSpan));
-        }
-        else
-        {
-            using var fstream = File.OpenRead(datfile);
-            fstream.Read(MemoryMarshal.AsBytes(pinSpan));
-        }
+//        var datdir = Directories.InConfiguration(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DiegoG.WebWatcher");
+//        var datfile = Path.Combine(datdir, "voltagewatcher.cfg");
 
-        ConfigFile = datfile;
-        ConfigFileLastUpdate = File.GetLastWriteTime(datfile);
-        Reader = new(pin);
-    }
-}
+//        Directory.CreateDirectory(datdir);
+//        if (File.Exists(datfile) is false)
+//        {
+//            using var fstream = File.Open(datfile, FileMode.Create);
+//            pin = new SerialReader.PinConfiguration(11, 29, 31, 13, 15);
+//            fstream.Write(MemoryMarshal.AsBytes(pinSpan));
+//        }
+//        else
+//        {
+//            using var fstream = File.OpenRead(datfile);
+//            fstream.Read(MemoryMarshal.AsBytes(pinSpan));
+//        }
+
+//        ConfigFile = datfile;
+//        ConfigFileLastUpdate = File.GetLastWriteTime(datfile);
+//        Reader = new(pin);
+//    }
+//}

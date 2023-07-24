@@ -1,4 +1,6 @@
-﻿using DiegoG.TelegramBot.Types;
+﻿using System.Collections.Concurrent;
+using System.Text;
+using DiegoG.TelegramBot.Types;
 using DiegoG.WebWatcher;
 
 namespace WebWatcher.HouseVoltage;
@@ -6,6 +8,33 @@ namespace WebWatcher.HouseVoltage;
 [Subscription]
 public class VoltageSubscription : ISubscription
 {
+    public VoltageSubscription()
+    {
+        VoltageTracker.Tracker.IncomingNewReport += Tracker_IncomingNewReport;
+    }
+
+    private bool OutageReported;
+    private readonly ConcurrentQueue<VoltageReport> Reports = new();
+    private void Tracker_IncomingNewReport(VoltageReport report)
+    {
+        lock (Reports)
+        {
+            if (report.Label is VoltageReport.ReportLabel.Normal or VoltageReport.ReportLabel.BelowNormal or VoltageReport.ReportLabel.AboveNormal)
+            {
+                if (OutageReported)
+                {
+                    Reports.Enqueue(report);
+                    OutageReported = false;
+                }
+            }
+            else
+            {
+                Reports.Enqueue(report);
+                OutageReported = true;
+            }
+        }
+    }
+
     public string Name => "VoltageSubscription";
     public string Description => "Notifies when a change regarding the server's location voltage";
     public TimeSpan Interval => TimeSpan.FromSeconds(6);
@@ -16,46 +45,28 @@ public class VoltageSubscription : ISubscription
     public Task Unsubscribed(Telegram.Bot.Types.ChatId chat)
         => Task.CompletedTask;
 
-    private bool OutageReported;
-
     public Task Report(IEnumerable<Telegram.Bot.Types.ChatId> subscribers)
     {
-        var r = VoltageReport.Latest;
-        string msg;
+        var sb = StringBuilderStore.GetSharedStringBuilder();
+        string? msg = null;
+        while (Reports.TryDequeue(out var rep))
+            GenMessage(sb, rep).Append("\n\n");
 
-        if (r.Label is VoltageReport.ReportLabel.Normal or VoltageReport.ReportLabel.BelowNormal or VoltageReport.ReportLabel.AboveNormal)
-        {
-            if (OutageReported)
-            {
-                msg = GenMessage(r);
-                foreach (var chat in subscribers)
-                    OutBot.EnqueueAction(x => x.SendTextMessageAsync(chat, msg, Telegram.Bot.Types.Enums.ParseMode.Html));
-
-                OutageReported = false;
-            }
-        }
-        else
-        {
-            msg = GenMessage(r);
+        if (msg != null)
             foreach (var chat in subscribers)
                 OutBot.EnqueueAction(x => x.SendTextMessageAsync(chat, msg, Telegram.Bot.Types.Enums.ParseMode.Html));
-
-            OutageReported = true;
-        }
 
         return Task.CompletedTask;
     }
 
-    private static string GenMessage(in VoltageReport report)
+    public static StringBuilder GenMessage(StringBuilder builder, in VoltageReport report)
     {
-        var sb = StringBuilderStore.GetSharedStringBuilder();
-
-        sb.Append(report.TimeStamp.ToString("ddd (dd/MM/yyyy) hh:mm:ss tt (UTCzzz)\n"))
+        builder.Append(report.TimeStamp.ToString("ddd (dd/MM/yyyy) hh:mm:ss tt (UTCzzz)\n"))
             .Append("<b>RMS</b>: <u>").Append(report.RMS.ToString("0")).Append("</u>\n")
             .Append("<b>Peak</b>: ").Append(report.Peak.ToString("0.00")).AppendLine()
             .Append("<b>Valley</b>: ").Append(report.Valley.ToString("0.00")).AppendLine();
 
-        sb.Append(report.Label switch
+        builder.Append(report.Label switch
         {
             VoltageReport.ReportLabel.Outage => "<u>Outage</u> ⚠️❌",
             VoltageReport.ReportLabel.BrownOut => "<u>Brown-out ⚠️⭕️",
@@ -67,6 +78,9 @@ public class VoltageSubscription : ISubscription
             _ => "<u>Unknown label, report to bot administrator</u>"
         });
 
-        return sb.ToString();
+        return builder;
     }
+
+    public static string GenMessage(in VoltageReport report)
+        => GenMessage(StringBuilderStore.GetSharedStringBuilder(), report).ToString();
 }
