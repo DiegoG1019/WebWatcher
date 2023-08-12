@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace WebWatcher.HouseVoltage;
+namespace DiegoG.WebWatcher;
 public class CircularList<T> : ICollection<T>, IReadOnlyCollection<T>
 {
     private readonly T[] _list;
@@ -36,7 +33,7 @@ public class CircularList<T> : ICollection<T>, IReadOnlyCollection<T>
 
     public void CopyTo(T[] array, int arrayIndex)
     {
-        for (int i = 0; i < (array.Length - arrayIndex) && i < fill; i++)
+        for (int i = 0; i < array.Length - arrayIndex && i < fill; i++)
             array[i + arrayIndex] = _list[(i + head) % fill];
     }
 

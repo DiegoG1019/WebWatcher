@@ -1,14 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Device.Gpio;
-using System.Formats.Tar;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using DiegoG.TelegramBot.Types;
-using DiegoG.Utilities.Collections;
-using DiegoG.Utilities.Settings;
-using DiegoG.WebWatcher;
-
-namespace WebWatcher.HouseVoltage;
+﻿namespace WebWatcher.HouseVoltage;
 
 // // This watcher was commented out because its duties were deferred to VoltageTracker, since it needs to be fired much more frequently
 

@@ -1,19 +1,14 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
-namespace DiegoG.WebWatcher
+namespace DiegoG.WebWatcher;
+
+public class Worker : BackgroundService
 {
-    public class Worker : BackgroundService
-    {
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
-            => Task.WhenAll(
-                Task.Run(async () => await WatcherService.Active(stoppingToken), stoppingToken), 
-                Task.Run(async () => await SubscriptionService.Active(stoppingToken), stoppingToken)
-            );
-    }
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        => Task.WhenAny(
+            Task.Run(async () => await WatcherService.Active(stoppingToken), stoppingToken),
+            Task.Run(async () => await SubscriptionService.Active(stoppingToken), stoppingToken)
+        );
 }

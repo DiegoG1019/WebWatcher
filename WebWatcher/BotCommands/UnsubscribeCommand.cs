@@ -12,23 +12,17 @@ public class UnsubscribeCommand : IBotCommand
 {
     public async Task<CommandResponse> Action(BotCommandArguments args)
     {
-        if (args.Arguments.Length < 1)
+        if (args.Arguments.Length <= 1)
             return new CommandResponse(args, false, "No subscription name provided");
 
         var sb = args.Arguments[1];
         var subscr = SubscriptionService.AvailableSubscriptionInfo.FirstOrDefault(x => x.Name == sb);
-        if (subscr is null)
-            return new CommandResponse(args, false, "Unknown subscription");
-
-        var node = subscr.Subscribers.Find(args.FromChat);
-        if (node is not null)
-        {
-            subscr.Subscribers.Remove(node);
-            SubscriptionService.SaveSubscriberData();
-            return new CommandResponse(args, false, $"Succesfully unsubscribed from '{sb}'");
-        }
-
-        return new CommandResponse(args, false, $"Not subscribed to '{sb}'");
+        
+        return subscr is null
+            ? new CommandResponse(args, false, "Unknown subscription")
+            : await subscr.RemoveSubscriber(args.FromChat)
+            ? new CommandResponse(args, false, $"Succesfully unsubscribed from '{sb}'")
+            : new CommandResponse(args, false, $"Not subscribed to '{sb}'");
     }
 
     public Task<CommandResponse> ActionReply(BotCommandArguments args)

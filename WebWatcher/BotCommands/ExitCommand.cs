@@ -1,12 +1,9 @@
-﻿using DiegoG.TelegramBot.Types;
-using DiegoG.TelegramBot;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using DiegoG.TelegramBot;
+using DiegoG.TelegramBot.Types;
 using Telegram.Bot.Types;
-using DiegoG.Utilities.Settings;
 
 namespace DiegoG.WebWatcher.BotCommands;
 
@@ -42,7 +39,7 @@ public class ExitCommand : IBotCommand
             {
                 _ = Task.Run(async () =>
                 {
-						await Task.WhenAll(new[]{ Settings<WatcherSettings>.SaveSettingsAsync(), Task.Delay(1000) });
+                    await Task.WhenAll(new[] { WatcherSettings.SaveToFileAsync(), Task.Delay(1000) });
                     Environment.Exit(0);
                 });
                 Cancel(args.User);

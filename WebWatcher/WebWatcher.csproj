@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DiegoG.Utilities.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
@@ -17,6 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\DiegoG.TelegramBot\DiegoG.TelegramBot\DiegoG.TelegramBot.csproj" />
+    <ProjectReference Include="..\WebWatcher.HouseVoltage\WebWatcher.HouseVoltage.csproj" Condition="$(DefineConstants.Contains('DEBUG'))" />
+    <ProjectReference Include="..\WebWatcher.URBE\WebWatcher.URBE.csproj" Condition="$(DefineConstants.Contains('DEBUG'))" />
     <ProjectReference Include="..\WebWatcherLibrary\WebWatcherLibrary.csproj" />
   </ItemGroup>
 </Project>

@@ -2,9 +2,11 @@
 
 internal class Program
 {
-    static void Main(string[] args)
+    private static VoltageTracker Tracker = new("COM3");
+
+    private static void Main(string[] args)
     {
-        VoltageTracker.Tracker.IncomingNewReport += Tracker_IncomingNewReport;
+        Tracker.IncomingNewReport += Tracker_IncomingNewReport;
         while (true) Thread.Sleep(10);
     }
 

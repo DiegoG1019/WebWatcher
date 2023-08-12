@@ -1,10 +1,10 @@
-﻿using DiegoG.TelegramBot;
-using DiegoG.TelegramBot.Types;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using DiegoG.TelegramBot;
+using DiegoG.TelegramBot.Types;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace DiegoG.WebWatcher.BotCommands;
@@ -52,7 +52,7 @@ public class Subscriptions : IBotCommand
             {
                 builder.Append(subscr.Name);
 
-                if (subscr.Subscribers.Contains(args.FromChat))
+                if (subscr.SubscriberList.Contains(args.FromChat))
                     builder.Append(" (Subscribed)");
 
                 if ((!OutputBot.GetAdmin(args.User.Id, out var adm) || adm.Rights < AdminRights.Moderator))
@@ -72,18 +72,18 @@ public class Subscriptions : IBotCommand
             foreach (var subscr in SubscriptionService.AvailableSubscriptionInfo)
             {
                 builder.Append("\n - <b>").Append(subscr.Name);
-                if (subscr.Subscribers.Contains(args.FromChat))
+                if (subscr.SubscriberList.Contains(args.FromChat))
                     builder.Append(" (Subscribed)");
                 builder.Append("</b>: ").Append(subscr.Subscription.Description);
             }
 
             var str = builder.ToString();
-            return new(false, x => x.SendTextMessageAsync(args.FromChat, str, Telegram.Bot.Types.Enums.ParseMode.Html));
+            return new(false, x => x.SendTextMessageAsync(args.FromChat, str, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html));
         }
 
         CommandResponse enableOrDisable()
         {
-            if ((!OutputBot.GetAdmin(args.User.Id, out var adm) || adm.Rights < AdminRights.Moderator))
+            if ((!OutputBot.GetAdmin(args.User, out var adm) || adm.Rights < AdminRights.Moderator))
                 return new(args, false, "You do not have permissions to enable or disable subscriptions");
 
             var p = SubscriptionService.AvailableSubscriptionInfo.FirstOrDefault(x => x.Name == a[1]);

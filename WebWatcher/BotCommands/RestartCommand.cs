@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DiegoG.TelegramBot.Types;
-using DiegoG.TelegramBot;
-using DiegoG.Utilities.Settings;
-using Telegram.Bot.Types;
 using System.Diagnostics;
-using System.IO;
-using File = System.IO.File;
+using System.Threading.Tasks;
+using DiegoG.TelegramBot;
+using DiegoG.TelegramBot.Types;
+using Telegram.Bot.Types;
 
 namespace DiegoG.WebWatcher.BotCommands;
 
@@ -45,12 +40,12 @@ public class RestartCommand : IBotCommand
             {
                 _ = Task.Run(async () =>
                 {
-                    await Task.WhenAll(new[] { Settings<WatcherSettings>.SaveSettingsAsync(), Task.Delay(1000) });
+                    await Task.WhenAll(new[] { WatcherSettings.SaveToFileAsync(), Task.Delay(1000) });
 
-                    if (Settings<WatcherSettings>.Current.RestartCommand is string cmd)
+                    if (WatcherSettings.Current.RestartCommand is string cmd)
                         Process.Start(new ProcessStartInfo(cmd)
                         {
-                            Arguments = Settings<WatcherSettings>.Current.RestartCommandArguments,
+                            Arguments = WatcherSettings.Current.RestartCommandArguments,
                             UseShellExecute = true
                         });
                     else
@@ -70,7 +65,7 @@ public class RestartCommand : IBotCommand
         if (!OutputBot.GetAdmin(args.User.Id, out var adm) || adm.Rights < AdminRights.Admin)
             return new(args, false, "You do not have permissions to perform this operation");
 
-        if (Settings<WatcherSettings>.Current.RestartCommand is not string cmd)
+        if (WatcherSettings.Current.RestartCommand is not string cmd)
             return new(args, false, "This instance of WebWatcher was not configured with a RestartCommand. Check the Settings file and restart manually to configure it.");
 
         Held.Add(args.User);

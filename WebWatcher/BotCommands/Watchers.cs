@@ -1,11 +1,9 @@
-﻿using DiegoG.TelegramBot;
-using DiegoG.TelegramBot.Types;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using DiegoG.TelegramBot;
+using DiegoG.TelegramBot.Types;
 using Telegram.Bot.Types;
 
 namespace DiegoG.WebWatcher.BotCommands;

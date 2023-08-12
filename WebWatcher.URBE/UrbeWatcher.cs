@@ -1,5 +1,5 @@
-﻿using DiegoG.Utilities.Settings;
-using DiegoG.WebWatcher;
+﻿using DiegoG.WebWatcher;
+using Telegram.Bot;
 
 namespace WebWatcher.URBE;
 
@@ -21,13 +21,13 @@ public class UrbeWatcher : IWebWatcher
         {
             if (IsActive)
             {
-                OutBot.EnqueueAction(x => x.SendTextMessageAsync(Settings<WatcherSettings>.Current.LogChatId, $"URBE is down again! See at {UrbeUri}", disableWebPagePreview: true));
+                OutBot.EnqueueAction(x => x.SendTextMessageAsync(WatcherSettings.Current.LogChatId, $"URBE is down again! See at {UrbeUri}", disableWebPagePreview: true));
                 IsActive = false;
             }
         }
         else if (IsActive is false)
         {
-            OutBot.EnqueueAction(x => x.SendTextMessageAsync(Settings<WatcherSettings>.Current.LogChatId, $"URBE is up! See at {UrbeUri}", disableWebPagePreview: true));
+            OutBot.EnqueueAction(x => x.SendTextMessageAsync(WatcherSettings.Current.LogChatId, $"URBE is up! See at {UrbeUri}", disableWebPagePreview: true));
             IsActive = true;
         }
     }

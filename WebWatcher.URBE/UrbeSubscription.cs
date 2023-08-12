@@ -1,4 +1,5 @@
 ﻿using DiegoG.WebWatcher;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace WebWatcher.URBE;
@@ -40,5 +41,4 @@ public class UrbeSubscription : ISubscription
             IsActive = true;
         }
     }
-
 }

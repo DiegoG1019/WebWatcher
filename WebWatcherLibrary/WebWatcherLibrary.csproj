@@ -13,14 +13,13 @@
 
   <ItemGroup>
     <PackageReference Include="DiegoG.RssFeedParser" Version="1.1.0" />
-    <PackageReference Include="DiegoG.TelegramBot" Version="1.7.10" />
-    <PackageReference Include="DiegoG.Utilities.Basic" Version="1.5.2" />
-    <PackageReference Include="DiegoG.Utilities.Collections" Version="1.0.0" />
-    <PackageReference Include="DiegoG.Utilities.Reflection" Version="1.1.2" />
-    <PackageReference Include="DiegoG.Utilities.Serialization" Version="1.0.1" />
-    <PackageReference Include="DiegoG.Utilities.Settings" Version="1.0.6" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.49" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.51" />
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
+    <PackageReference Include="System.IO.Ports" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\DiegoG.TelegramBot\DiegoG.TelegramBot\DiegoG.TelegramBot.csproj" />
   </ItemGroup>
 
 </Project>

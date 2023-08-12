@@ -1,17 +1,14 @@
-﻿using DiegoG.Utilities;
-using DiegoG.Utilities.Basic;
-using DiegoG.Utilities.IO;
-using DiegoG.Utilities.Reflection;
-using DiegoG.Utilities.Settings;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using DiegoG.Utilities.Reflection;
+using Serilog;
 using Telegram.Bot.Types;
 using File = System.IO.File;
 
@@ -29,8 +26,10 @@ public static class SubscriptionService
         public readonly ISubscription Subscription;
         public readonly Task Timer;
         public readonly string Name;
-        public readonly Action<SubscriptionInfo> Action;
-        public readonly LinkedList<ChatId> Subscribers;
+        private readonly Action<IEnumerable<ChatId>, SubscriptionInfo> Action;
+        private readonly HashSet<ChatId> Subscribers;
+
+        public IEnumerable<ChatId> SubscriberList => Subscribers;
 
         public bool Pause { get; set; }
 
@@ -39,11 +38,46 @@ public static class SubscriptionService
         public void Stop()
             => Cancel = true;
 
+        public async Task<bool> AddSubscriber(ChatId chatId)
+        {
+            lock (Subscribers)
+            {
+                if (Subscribers.Add(chatId) is false)
+                    return false;
+                SaveSubscriberData();
+            }
+            await Subscription.Subscribed(chatId);
+            return true;
+        }
+
+        public async Task<bool> RemoveSubscriber(ChatId chatId)
+        {
+            lock (Subscribers)
+            {
+                if (Subscribers.Remove(chatId) is false)
+                    return false;
+                SaveSubscriberData();
+            }
+            await Subscription.Unsubscribed(chatId);
+            return true;
+        }
+
+        public async Task ClearSubscribers()
+        {
+            foreach (var sub in Subscribers)
+                await RemoveSubscriber(sub);
+        }
+
+        public void Execute()
+        {
+            Action(Subscribers, this);
+        }
+
 #if DEBUG
         private static int i = 0;
         private readonly int id;
 #endif
-        public SubscriptionInfo(ISubscription subscription, Action<SubscriptionInfo> action)
+        public SubscriptionInfo(ISubscription subscription, Action<IEnumerable<ChatId>, SubscriptionInfo> action)
         {
 #if DEBUG
             id = i++;
@@ -62,10 +96,10 @@ public static class SubscriptionService
                     {
                         await Task.Delay(subscription.Interval);
                         if (!Pause)
-                            Action(this);
+                            Execute();
                     }
-                }, 
-                CancellationToken.None, 
+                },
+                CancellationToken.None,
                 TaskCreationOptions.LongRunning
             );
         }
@@ -81,10 +115,10 @@ public static class SubscriptionService
     public static IEnumerable<SubscriptionInfo> AvailableSubscriptionInfo => Subscriptions;
 
     private static readonly List<string> SubscriptionNameList = new();
-    private static readonly ConcurrentQueue<Func<Task>> ActionQueue = new();
+    private static readonly ConcurrentQueue<Func<CancellationToken, Task>> ActionQueue = new();
     private static readonly List<SubscriptionInfo> Subscriptions = new();
     private static readonly ConcurrentDictionary<int, string> TaskDict = new();
-    
+
     public static void AddSubscription(Type subscriptionType)
     {
         ISubscription sub;
@@ -92,7 +126,7 @@ public static class SubscriptionService
         {
             sub = (ISubscription)Activator.CreateInstance(subscriptionType)!;
 
-            var enable = Settings<WatcherSettings>.Current.SubscriptionEnableList;
+            var enable = WatcherSettings.Current.SubscriptionEnableList;
             if (!enable.ContainsKey(sub.Name))
                 enable.Add(sub.Name, true);
 
@@ -108,7 +142,7 @@ public static class SubscriptionService
         else
             return;
 
-        if(!sub.Validate(out var msg))
+        if (!sub.Validate(out var msg))
         {
             Log.Error($"Failed to load watcher {sub.Name}: {msg}");
             return;
@@ -116,12 +150,12 @@ public static class SubscriptionService
 
         SubscriptionInfo subs = new(
             sub,
-            pair => ActionQueue.Enqueue(() =>
+            (sublist, pair) => ActionQueue.Enqueue(ct =>
             {
                 if (!Statistics.TotalRuns.ContainsKey(pair.Name))
                     Statistics.TotalRuns.Add(pair.Name, 0);
                 Statistics.TotalRuns[pair.Name]++;
-                var t = pair.Subscription.Report(pair.Subscribers);
+                var t = pair.Subscription.Report(sublist);
                 TaskDict[t.Id] = pair.Name;
                 return t;
             }));
@@ -134,7 +168,7 @@ public static class SubscriptionService
     public static void ForceCheck(string watcher)
     {
         var w = Subscriptions.FirstOrDefault(s => s.Name == watcher) ?? throw new ArgumentException($"There isn't a watcher with the name of {watcher}", nameof(watcher));
-        w.Action(w);
+        w.Execute();
     }
 
     public static void RemoveSubscription(ISubscription sub)
@@ -159,7 +193,8 @@ public static class SubscriptionService
 
     public static async Task Active(CancellationToken token)
     {
-        AsyncTaskManager tasks = new();
+        await Task.Yield();
+        List<Task> tasks = new();
 
         Log.Information("Loading subscriber data");
 
@@ -170,9 +205,9 @@ public static class SubscriptionService
             {
                 if (dict.TryGetValue(subscr.Name, out var subscribers))
                 {
-                    subscr.Subscribers.Clear();
+                    await subscr.ClearSubscribers();
                     foreach (var subscriber in subscribers)
-                        subscr.Subscribers.AddLast(subscriber);
+                        await subscr.AddSubscriber(subscriber.ToChatId());
                 }
             }
         }
@@ -180,33 +215,58 @@ public static class SubscriptionService
         Log.Information("Starting SubscriptionService");
         while (!token.IsCancellationRequested)
         {
-            var throttletask = Task.Delay(250, CancellationToken.None);
+            try
+            {
+                var throttletask = Task.Delay(250, CancellationToken.None);
 
-            for (int i = 0; i < MaxTasks && !ActionQueue.IsEmpty; i++)
-                if (ActionQueue.TryDequeue(out var task))
-                    tasks.Add(task());
+                var cancel = new CancellationTokenSource(10_000);
+                for (int i = 0; i < MaxTasks && !ActionQueue.IsEmpty; i++)
+                    if (ActionQueue.TryDequeue(out var task))
+                        tasks.Add(task(cancel.Token));
 
-            //--
-            Statistics.TotalTasksAwaited += (ulong)tasks.Count;
-            Statistics.AverageTasksPerLoop.AddSample(tasks.Count);
+                //--
+                Statistics.TotalTasksAwaited += (ulong)tasks.Count;
+                Statistics.TasksPerLoop.Add(tasks.Count);
 
-            foreach (var t in tasks)
-                await t.AwaitWithTimeout(5000, ifError: () =>
+                foreach (var task in tasks)
                 {
-                    TaskDict.TryGetValue(t.Id, out var v);
-                    Log.Error("Task #{taskId} took too long to complete. Task #{taskId} belongs to subscription {subscription}", t.Id, v ?? "Unknown");
-                });
-            tasks.Clear();
+                    try
+                    {
+                        await task;
+                    }
+                    catch (TimeoutException)
+                    {
+                        TaskDict.TryGetValue(task.Id, out var v);
+                        Log.Error("One or more task took too long to complete. The task belongs to subscription {subscription}", task.Id, v ?? "Unknown");
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        TaskDict.TryGetValue(task.Id, out var v);
+                        Log.Error("One or more task took too long to complete. The task belongs to subscription {subscription}", task.Id, v ?? "Unknown");
+                    }
+                    finally
+                    {
+                        TaskDict.TryRemove(task.Id, out _);
+                    }
+                }
 
-            if (throttletask.IsCompleted)
-                Statistics.OverworkedLoops++;
-            else
-                await throttletask;
+                tasks.Clear();
+
+                if (throttletask.IsCompleted)
+                    Statistics.OverworkedLoops++;
+                else
+                    await throttletask;
+            }
+            catch (Exception e)
+            {
+                Log.Fatal(e, "Unexpected exception thrown in SubscriptionService");
+                throw;
+            }
         }
         Log.Information("Termination Signal Received, Stopping SubscriptionService");
     }
 
-    private readonly static Dictionary<Type, ISubscription> LoadedTypes = new();
+    private static readonly Dictionary<Type, ISubscription> LoadedTypes = new();
 
     /// <summary>
     /// Scours the current executing assembly searching for types decorated with the SubscriptionAttribute, and adds them automatically
@@ -228,16 +288,17 @@ public static class SubscriptionService
         }
     }
 
-    public static void SaveSubscriberData()
+    private static Task SaveSubscriberData()
     {
         try
         {
             using var fstream = File.Open(Directories.InData("subscribers.json"), FileMode.Create);
-            JsonSerializer.Serialize(fstream, AvailableSubscriptionInfo.Select(x => new SubscriptionWriteInfoBuffer(x.Name, x.Subscribers.Select(x => x.Identifier))));
+            return JsonSerializer.SerializeAsync(fstream, AvailableSubscriptionInfo.Select(x => new SubscriptionWriteInfoBuffer(x.Name, x.SubscriberList.Select(x => new ChatIdBuffer(x)))));
         }
         catch (Exception e)
         {
             Log.Error(e, "Could not save subscriber data");
+            return Task.CompletedTask;
         }
     }
 
@@ -247,10 +308,48 @@ public static class SubscriptionService
         if (File.Exists(fname) is false)
             return Array.Empty<SubscriptionReadInfoBuffer>();
 
-        using var fstream = File.Open(fname, FileMode.Open);
-        return JsonSerializer.Deserialize<SubscriptionReadInfoBuffer[]>(fstream) ?? Array.Empty<SubscriptionReadInfoBuffer>();
+        try
+        {
+            using var fstream = File.Open(fname, FileMode.Open);
+            return JsonSerializer.Deserialize<SubscriptionReadInfoBuffer[]>(fstream) ?? Array.Empty<SubscriptionReadInfoBuffer>();
+        }
+        catch(Exception e)
+        {
+            ;
+            throw;
+        }
     }
 
-    private readonly record struct SubscriptionWriteInfoBuffer(string SubscriptionName, IEnumerable<long> Subscribers);
-    private readonly record struct SubscriptionReadInfoBuffer(string SubscriptionName, long[] Subscribers);
+    private readonly record struct SubscriptionWriteInfoBuffer(string SubscriptionName, IEnumerable<ChatIdBuffer> Subscribers);
+    private readonly record struct SubscriptionReadInfoBuffer(string SubscriptionName, ChatIdBuffer[] Subscribers);
+    private readonly struct ChatIdBuffer
+    {
+        public string Identifier { get; }
+        public bool IsUsername { get; }
+
+        public ChatIdBuffer(ChatId chatId)
+        {
+            ArgumentNullException.ThrowIfNull(chatId);
+            if (chatId.Identifier is long iden)
+            {
+                Identifier = iden.ToString();
+                IsUsername = false;
+            }
+            else
+            {
+                Identifier = chatId.Username!;
+                IsUsername = true;
+            }
+        }
+
+        [JsonConstructor]
+        public ChatIdBuffer(string identifier, bool isUsername)
+        {
+            Identifier = identifier;
+            IsUsername = isUsername;
+        }
+
+        public ChatId ToChatId()
+            => IsUsername ? new ChatId(Identifier) : new ChatId(long.Parse(Identifier));
+    }   
 }

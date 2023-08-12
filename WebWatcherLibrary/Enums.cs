@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace DiegoG.WebWatcher;
 
-namespace DiegoG.WebWatcher
+public enum AdminRights
 {
-    public enum AdminRights
-    {
-        Disallow,
-        User,
-        Moderator,
-        Admin,
-        Creator
-    }
+    Disallow,
+    User,
+    Moderator,
+    Admin,
+    Creator
 }

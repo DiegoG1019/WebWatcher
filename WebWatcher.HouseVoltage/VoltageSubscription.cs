@@ -1,16 +1,18 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
-using DiegoG.TelegramBot.Types;
 using DiegoG.WebWatcher;
+using Telegram.Bot;
 
 namespace WebWatcher.HouseVoltage;
 
 [Subscription]
 public class VoltageSubscription : ISubscription
 {
+    public static VoltageTracker Tracker { get; } = new();
+
     public VoltageSubscription()
     {
-        VoltageTracker.Tracker.IncomingNewReport += Tracker_IncomingNewReport;
+        Tracker.IncomingNewReport += Tracker_IncomingNewReport;
     }
 
     private bool OutageReported;
@@ -37,7 +39,7 @@ public class VoltageSubscription : ISubscription
 
     public string Name => "VoltageSubscription";
     public string Description => "Notifies when a change regarding the server's location voltage";
-    public TimeSpan Interval => TimeSpan.FromSeconds(6);
+    public TimeSpan Interval => TimeSpan.FromSeconds(2);
 
     public Task Subscribed(Telegram.Bot.Types.ChatId chat)
         => Task.CompletedTask;
@@ -48,13 +50,15 @@ public class VoltageSubscription : ISubscription
     public Task Report(IEnumerable<Telegram.Bot.Types.ChatId> subscribers)
     {
         var sb = StringBuilderStore.GetSharedStringBuilder();
-        string? msg = null;
         while (Reports.TryDequeue(out var rep))
             GenMessage(sb, rep).Append("\n\n");
 
-        if (msg != null)
+        if (sb.Length > 0)
+        {
+            var msg = sb.ToString();
             foreach (var chat in subscribers)
-                OutBot.EnqueueAction(x => x.SendTextMessageAsync(chat, msg, Telegram.Bot.Types.Enums.ParseMode.Html));
+                OutBot.EnqueueAction(x => x.SendTextMessageAsync(chat, msg, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html));
+        }
 
         return Task.CompletedTask;
     }
@@ -69,7 +73,7 @@ public class VoltageSubscription : ISubscription
         builder.Append(report.Label switch
         {
             VoltageReport.ReportLabel.Outage => "<u>Outage</u> ⚠️❌",
-            VoltageReport.ReportLabel.BrownOut => "<u>Brown-out ⚠️⭕️",
+            VoltageReport.ReportLabel.BrownOut => "<u>Brown-out</u> ⚠️⭕️",
             VoltageReport.ReportLabel.BelowNormal => "<u>Below Normal</u> ⚠️",
             VoltageReport.ReportLabel.Normal => "<u>Normal</u> ✅",
             VoltageReport.ReportLabel.PotentPowerSurge => "<u>Power Surge</u> ⚠️📛",

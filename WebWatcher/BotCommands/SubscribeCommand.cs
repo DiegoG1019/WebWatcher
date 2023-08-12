@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DiegoG.TelegramBot;
 using DiegoG.TelegramBot.Types;
-using Serilog;
 using Telegram.Bot.Types;
 
 namespace DiegoG.WebWatcher.BotCommands;
@@ -20,17 +17,12 @@ public class SubscribeCommand : IBotCommand
 
         var sb = args.Arguments[1];
         var subscr = SubscriptionService.AvailableSubscriptionInfo.FirstOrDefault(x => x.Name == sb);
-        if (subscr is null)
-            return new CommandResponse(args, false, "Unknown subscription");
-
-        if (subscr.Subscribers.Contains(args.FromChat) is false)
-        {
-            subscr.Subscribers.AddLast(args.FromChat);
-            SubscriptionService.SaveSubscriberData();
-            return new CommandResponse(args, false, $"Succesfully subscribed to '{sb}'");
-        }
-
-        return new CommandResponse(args, false, $"Already subscribed to '{sb}'");
+        
+        return subscr is null
+            ? new CommandResponse(args, false, "Unknown subscription")
+            : await subscr.AddSubscriber(args.FromChat) is false
+            ? new CommandResponse(args, false, $"Already subscribed to '{sb}'")
+            : new CommandResponse(args, false, $"Succesfully subscribed to '{sb}'");
     }
 
     public Task<CommandResponse> ActionReply(BotCommandArguments args)
